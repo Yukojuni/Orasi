@@ -41,7 +41,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/20 mt-8 pt-8 text-center text-sm opacity-75">
-          <p>&copy; 2024 ORASI. Tous droits réservés.</p>
+          <p>&copy; 2025 ORASI. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

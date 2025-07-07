@@ -1,12 +1,7 @@
--- Création des tables pour ORASI
-
 -- Table des utilisateurs
 CREATE TABLE IF NOT EXISTS users (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    pseudo VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    numero_tel VARCHAR(20) UNIQUE,
-    mot_de_passe TEXT NOT NULL,
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    pseudo VARCHAR(50) UNIQUE,
     avatar_url TEXT,
     bio TEXT,
     role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'admin')),
@@ -35,12 +30,13 @@ CREATE TABLE IF NOT EXISTS commentaires (
 );
 
 -- Table des réactions (likes/dislikes)
-CREATE TABLE IF NOT EXISTS reactions (
+CREATE TABLE IF NOT EXISTS commentaire_reactions (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     utilisateur_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    article_id UUID REFERENCES articles(id) ON DELETE CASCADE,
+    commentaire_id UUID REFERENCES commentaires(id) ON DELETE CASCADE,
     type VARCHAR(10) CHECK (type IN ('like', 'dislike')) NOT NULL,
-    UNIQUE(utilisateur_id, article_id)
+    date_reaction TIMESTAMP DEFAULT NOW(),
+    UNIQUE(utilisateur_id, commentaire_id)
 );
 
 -- Table des favoris

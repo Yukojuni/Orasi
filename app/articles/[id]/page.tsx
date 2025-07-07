@@ -78,8 +78,8 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
     )
   }
 
-  const auteurPseudo = article.auteur_id?.[0]?.pseudo || "Inconnu"
-  const auteurAvatar = article.auteur_id?.[0]?.avatar_url || null
+  const auteurPseudo = article.auteur_id?.pseudo || "Inconnu"
+  const auteurAvatar = article.auteur_id?.avatar_url || null
 
   return (
     <div className="min-h-screen flex flex-col">

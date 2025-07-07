@@ -93,7 +93,7 @@ export default function HomePage() {
       </section>
 
       {/* Articles en vedette */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4">
         <div className="container mx-auto">
           <h2 className="text-5xl font-['Cambria_Math'] text-center text-black mb-12">Derniers articles</h2>
 
