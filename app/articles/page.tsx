@@ -65,7 +65,7 @@ export default function ArticlesPage() {
       <Header />
 
       {/* Filtres + Recherche */}
-      <section className="py-8 px-4 bg-[#FFFDFA]">
+      <section className="py-8 px-4 bg-[#FFFFFF]">
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="relative flex-1 max-w-md">
@@ -75,7 +75,7 @@ export default function ArticlesPage() {
                 placeholder="Rechercher un article..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 border-[#4E3AC4] rounded-none rounded-br-xl font-['Cambria_Math'] uppercase"
+                className="pl-10 border-[#4E3AC4] text-[#4B4B4B] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math']"
               />
             </div>
 
@@ -89,8 +89,8 @@ export default function ArticlesPage() {
                     rounded-none rounded-br-xl font-['Cambria_Math'] uppercase text-sm
                     ${
                       selectedTheme === theme
-                        ? "bg-[#4E3AC4] text-white hover:bg-[#3d2ea3]"
-                        : "border-[#4E3AC4] text-[#4B4B4B] hover:bg-[#4E3AC4] hover:text-white"
+                        ? "bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase"
+                        : "border-[#4E3AC4] text-[#4B4B4B] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase"
                     }
                   `}
                 >
@@ -103,7 +103,7 @@ export default function ArticlesPage() {
       </section>
 
       {/* Affichage des articles */}
-      <section className="py-16 px-4">
+      <section className="=py-16 px-4">
         <div className="container mx-auto">
           {loading ? (
             <p className="text-center text-[#4B4B4B]">Chargement des articles...</p>

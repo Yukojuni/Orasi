@@ -35,7 +35,7 @@ export default function Footer() {
             <h4 className="text-lg font-semibold mb-4 font-['Cambria_Math']">Contact</h4>
             <p className="text-sm opacity-90">
               Une question ? Une suggestion ?<br />
-              Contactez-nous à contact@orasi.fr
+              Contactez-nous à orasi.contact@gmail.com
             </p>
           </div>
         </div>

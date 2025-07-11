@@ -184,14 +184,6 @@ export default function CommentSection({articleId, filterByUser = false,}: {arti
             return (
               <li key={c.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <div className="flex items-start gap-4 relative">
-                  {auteur?.avatar_url ? (
-                    <img src={auteur.avatar_url} alt={auteur.pseudo} className="w-12 h-12 rounded-full object-cover" />
-                  ) : (
-                    <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-                      <User size={20} className="text-gray-600" />
-                    </div>
-                  )}
-
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="text-lg font-['Cambria_Math'] text-[#4B4B4B]">{auteur?.pseudo || "Anonyme"}</h3>

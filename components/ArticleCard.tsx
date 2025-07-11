@@ -20,11 +20,12 @@ interface ArticleCardProps {
 export default function ArticleCard({ article, featured = false }: ArticleCardProps) {
   const getThemeColor = (theme: string) => {
     const colors = {
-      Géopolitique: "bg-[#4E3AC4]",
-      Culture: "bg-[#5DC2A3]",
-      Politique: "bg-[#F9B626]",
-      Société: "bg-[#A8C6FF]",
-      Opinion: "bg-[#4B4B4B]",
+      Culture: "bg-[#fc6cc4]",
+      Sociologie: "bg-[#ff3131]",
+      Géopolitique: "bg-[#ff3131]",
+      Société: "bg-[#f87c24]",
+      Opinion: "bg-[#c02f2c]",
+      Politique: "bg-[#70b4e4]",
     }
     return colors[theme as keyof typeof colors] || "bg-[#4B4B4B]"
   }
@@ -50,7 +51,6 @@ export default function ArticleCard({ article, featured = false }: ArticleCardPr
         <div
           className={`
           absolute bottom-0 left-0 right-0 p-6
-          ${featured ? "text-white" : "bg-white"}
         `}
         >
           {/* Tag thème */}
@@ -66,7 +66,7 @@ export default function ArticleCard({ article, featured = false }: ArticleCardPr
           {/* Titre */}
           <h3
             className={`
-            text-xl font-['Cambria_Math'] mb-2 line-clamp-3
+            inline-block px-4 py-2 rounded-tr-lg text-[#4B4B4B] text-sm font-['Cambria_Math'] bg-white
             ${featured ? "text-white" : "text-[#4B4B4B]"}
           `}
           >
@@ -76,7 +76,7 @@ export default function ArticleCard({ article, featured = false }: ArticleCardPr
           {/* Description */}
           <p
             className={`
-            text-sm mb-4 line-clamp-2
+            inline-block px-4 py-2 rounded-r-lg text-[#4B4B4B] text-sm font-['Cambria_Math'] bg-white
             ${featured ? "text-white/90" : "text-[#4B4B4B]"}
           `}
           >
@@ -86,7 +86,7 @@ export default function ArticleCard({ article, featured = false }: ArticleCardPr
           {/* Métadonnées */}
           <div
             className={`
-            flex items-center justify-between text-xs
+            inline-block px-4 py-2 rounded-b-lg text-[#4B4B4B] text-sm font-['Cambria_Math'] bg-white
             ${featured ? "text-white/80" : "text-[#4B4B4B]/70"}
           `}
           >
@@ -95,15 +95,7 @@ export default function ArticleCard({ article, featured = false }: ArticleCardPr
                 <User size={12} />
                 <span className="font-['Cambria_Math'] uppercase">{article.auteur}</span>
               </span>
-              <span className="flex items-center space-x-1">
-                <Calendar size={12} />
-                <span>{new Date(article.date_publication).toLocaleDateString("fr-FR")}</span>
-              </span>
             </div>
-            <span className="flex items-center space-x-1">
-              <Eye size={12} />
-              <span>{article.nb_vues}</span>
-            </span>
           </div>
         </div>
       </div>

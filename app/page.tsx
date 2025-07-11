@@ -65,17 +65,17 @@ export default function HomePage() {
                 L'association étudiante qui donne du sens aux débats et à la culture générale.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/articles">
-                  <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-br-xl font-['Cambria_Math'] uppercase px-6 py-3">
-                    Lire un article
+                <Link href="/about">
+                  <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
+                  Devenir membre
                   </Button>
                 </Link>
-                <Link href="/about">
+                <Link href="/articles">
                   <Button
                     variant="outline"
-                    className="border-[#4E3AC4] text-[#4B4B4B] hover:bg-[#4E3AC4] hover:text-white rounded-none rounded-br-xl font-['Cambria_Math'] uppercase px-6 py-3"
+                    className="border-[#4E3AC4] text-[#4B4B4B] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase"
                   >
-                    Découvrir l'asso
+                    Lire un article
                   </Button>
                 </Link>
               </div>
@@ -114,8 +114,31 @@ export default function HomePage() {
 
           <div className="text-center">
             <Link href="/articles">
-              <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-br-xl font-['Cambria_Math'] uppercase px-8 py-3">
+              <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
                 Voir plus d'articles
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Actualités */}
+      <section className="py-16 px-4">
+        <div className="container mx-auto">
+          <h2 className="text-5xl font-['Cambria_Math'] text-center text-black mb-12">Les actualités</h2>
+          3 prochains evenements à venir
+          CTA
+          {loading ? (
+            <p className="text-center">Chargement des actualités...</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            </div>
+          )}
+
+          <div className="text-center">
+            <Link href="/articles">
+              <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
+                Voir nos actualités
               </Button>
             </Link>
           </div>
@@ -144,7 +167,7 @@ export default function HomePage() {
                 ce que devraient être certaines choses.
               </p>
               <Link href="/about">
-                <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-br-xl font-['Cambria_Math'] uppercase px-6 py-3">
+                <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
                   En savoir plus
                 </Button>
               </Link>
@@ -166,9 +189,9 @@ export default function HomePage() {
             <Input
               type="email"
               placeholder="Ton email"
-              className="border-[#4E3AC4] rounded-none rounded-br-xl font-['Cambria_Math'] uppercase"
+              className="border-[#4E3AC4] text-[#4B4B4B] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math']"
             />
-            <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-br-xl font-['Cambria_Math'] uppercase px-6">
+            <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
               S'inscrire
             </Button>
           </div>

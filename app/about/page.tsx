@@ -1,5 +1,7 @@
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 export default function AboutPage() {
   return (
@@ -7,7 +9,22 @@ export default function AboutPage() {
       <Header />
 
       <div className="container mx-auto px-4 py-16">
+        <div className="text-center bg-[#4E3AC4] text-white p-8 rounded-xl">
+          <h2 className="text-3xl font-['Cambria_Math'] mb-4">Rejoignez-nous</h2>
+            <p className="text-lg mb-6 opacity-90">vous souhaitez écrire un article ?<br/>  
+                                                  Vous en avez déjà un de prêt, n’hésitez pas à l’envoyer à orasi.contact@gmail.com<br/>  
+                                                  Toute demande de renseignement ? Envoyez nous un message sur instagram : orasi.france</p>
+            <Link href="https://www.helloasso.com/associations/orasi/adhesions/formulaire-d-adhesion-en-tant-que-membre-actif-orasi-8">
+                <Button
+                  variant="outline"
+                  className="border-[#FFFFFF] bg-[#FFFFFF] text-[#4B4B4B] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase"
+                >
+                  Adhérez à ORASI
+                </Button>
+              </Link>
+        </div>
         <div className="max-w-4xl mx-auto">
+          <br/><br/>  
           <h1 className="text-5xl font-['Cambria_Math'] text-[#4B4B4B] mb-8 text-center">À propos d'ORASI</h1>
 
           <div className="prose prose-lg max-w-none">
@@ -68,17 +85,6 @@ export default function AboutPage() {
                   </p>
                 </div>
               </div>
-            </div>
-
-            <div className="text-center bg-[#4E3AC4] text-white p-8 rounded-xl">
-              <h2 className="text-3xl font-['Cambria_Math'] mb-4">Rejoignez-nous</h2>
-              <p className="text-lg mb-6 opacity-90">Participez aux débats qui façonnent notre époque</p>
-              <a
-                href="/register"
-                className="inline-block bg-white text-[#4E3AC4] px-8 py-3 rounded-none rounded-br-xl font-['Cambria_Math'] uppercase font-semibold hover:bg-gray-100 transition-colors"
-              >
-                Devenir membre
-              </a>
             </div>
           </div>
         </div>
