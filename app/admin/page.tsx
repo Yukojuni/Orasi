@@ -21,6 +21,10 @@ export default function AdminPage() {
   const [comments, setComments] = useState<any[]>([])
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
+  const formatDateForInput = (isoDate: string | null) => {
+    if (!isoDate) return "";
+    return isoDate.split("T")[0]; // Garde seulement la partie YYYY-MM-DD
+  };
 
   // Vérification des droits admin
   useEffect(() => {
@@ -61,6 +65,8 @@ export default function AdminPage() {
 
   const handleCreateArticle = async (formData: any) => {
     console.log("Appel handleCreateArticle avec :", formData, "userId:", user?.id)
+    console.log("📅 Date reçue dans handleCreateArticle:", formData.date_publication)
+
     try {
       const { data, error } = await supabase.from("articles").insert([
         {
@@ -69,6 +75,7 @@ export default function AdminPage() {
           theme: formData.theme,
           auteur_id: user?.id,
           image_couverture: formData.image_couverture,
+          date_publication: formData.date_publication ? new Date(formData.date_publication) : new Date(),
         },
       ])
       console.log("Résultat insert:", { data, error })
@@ -104,22 +111,31 @@ export default function AdminPage() {
 
   const handleUpdateArticle = async (formData: any) => {
     console.log("Appel handleUpdateArticle avec :", formData);
+
     if (!formData.id) {
       console.error("ID de l'article manquant dans formData");
       return;
     }
 
     try {
+      // Construire dynamiquement les champs à mettre à jour
+      const updateData: any = {
+        titre: formData.titre,
+        contenu: formData.contenu,
+        theme: formData.theme,
+        image_couverture: formData.image_couverture || null,
+      };
+
+      // N'ajouter date_publication que si elle est définie (non null/undefined)
+      if (formData.date_publication !== null && formData.date_publication !== undefined) {
+        updateData.date_publication = formData.date_publication;
+      }
+
       const { data, error } = await supabase
         .from("articles")
-        .update({
-          titre: formData.titre,
-          contenu: formData.contenu,
-          theme: formData.theme,
-          image_couverture: formData.image_couverture || null,
-        })
+        .update(updateData)
         .eq("id", formData.id)
-        .select();  // <<<<-- Ici pour récupérer les données mises à jour
+        .select();  // Récupération des données mises à jour
 
       console.log("Résultat update:", { data, error });
 
@@ -137,7 +153,6 @@ export default function AdminPage() {
     }
   };
 
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -154,7 +169,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFDFA]">
+    <div className="min-h-screen">
       <Header />
 
       <div className="container mx-auto px-4 py-8">
@@ -411,6 +426,7 @@ export default function AdminPage() {
                     contenu: formData.get("contenu"),
                     theme: formData.get("theme"),
                     image_couverture: formData.get("image_couverture"),
+                    date_publication: formData.get("date_publication"),
                   })
                 }}
               >
@@ -464,6 +480,10 @@ export default function AdminPage() {
                       className="border-[#4E3AC4] rounded-none rounded-br-xl"
                     />
                   </div>
+                <div>
+                  <Label htmlFor="date_publication" className="font-['Cambria_Math'] uppercase">Date de publication</Label>
+                  <Input id="date_publication" name="date_publication" type="date" className="border-[#4E3AC4] rounded-none rounded-br-xl" />
+                </div> 
                 </div>
 
                 <div className="flex justify-end space-x-4 mt-6">
@@ -502,6 +522,7 @@ export default function AdminPage() {
                     contenu: formData.get("contenu"),
                     theme: formData.get("theme"),
                     image_couverture: formData.get("image_couverture"),
+                    date_publication: formData.get("date_publication"),
                   })
                 }}
               >
@@ -537,7 +558,16 @@ export default function AdminPage() {
                     <Textarea id="contenu" name="contenu" defaultValue={editingItem.contenu} required rows={10} className="border-[#4E3AC4] rounded-none rounded-br-xl" />
                   </div>
                 </div>
-
+                <div>
+                  <Label htmlFor="date_publication" className="font-['Cambria_Math'] uppercase">Date de publication</Label>
+                  <Input
+                    id="date_publication"
+                    name="date_publication"
+                    type="date"
+                    defaultValue={formatDateForInput(editingItem.date_publication)}
+                    className="border-[#4E3AC4] rounded-none rounded-br-xl"
+                  />
+                </div> 
                 <div className="flex justify-end space-x-4 mt-6">
                   <Button
                     type="button"

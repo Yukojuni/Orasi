@@ -22,7 +22,7 @@ export default function ArticleCard({ article, featured = false }: ArticleCardPr
     const colors = {
       Culture: "bg-[#fc6cc4]",
       Sociologie: "bg-[#ff3131]",
-      Géopolitique: "bg-[#ff3131]",
+      Géopolitique: "bg-[#f8ec24]",
       Société: "bg-[#f87c24]",
       Opinion: "bg-[#c02f2c]",
       Politique: "bg-[#70b4e4]",
@@ -39,14 +39,15 @@ export default function ArticleCard({ article, featured = false }: ArticleCardPr
         ${featured ? "bg-gradient-to-br from-[#4E3AC4] to-black/75" : "bg-white"}
       `}
       >
-        {/* Image de couverture */}
-        {article.image_couverture && !featured && (
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${article.image_couverture})` }}
-          />
-        )}
-
+        {/* Image de couverture ou dégradé par défaut */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: article.image_couverture && !featured
+              ? `url(${article.image_couverture})`
+              : `linear-gradient(135deg, #4E3AC4, #251C5E)`
+          }}
+        />
         {/* Contenu */}
         <div
           className={`

@@ -32,7 +32,7 @@ export default function Header() {
 
         {/* Navigation Desktop */}
         <nav className="hidden md:flex items-center space-x-8">
-          {["/", "/articles", "/evenements", "/about"].map((path, i) => (
+          {["/", "/articles", "/events", "/about"].map((path, i) => (
             <Link
               key={i}
               href={path}
@@ -42,18 +42,30 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-
+          
         {/* Auth Desktop */}
         <div className="hidden md:flex items-center space-x-4">
           {user ? (
-            <Link href="/profile">
-              <Button
-                variant="outline"
-                className="border-[#4E3AC4] text-[#4B4B4B] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase"
-              >
-                Profil
-              </Button>
-            </Link>
+            <>
+              {user.user_metadata?.role == "admin" && (
+                <Link href="/admin">
+                  <Button
+                    variant="outline"
+                    className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase"
+                  >
+                    Admin
+                  </Button>
+                </Link>
+              )}
+              <Link href="/profile">
+                <Button
+                  variant="outline"
+                  className="border-[#4E3AC4] text-[#4B4B4B] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase"
+                >
+                  Profil
+                </Button>
+              </Link>
+            </>
           ) : (
             <>
               <Link href="/login">
@@ -73,6 +85,7 @@ export default function Header() {
           )}
         </div>
 
+
         {/* Menu Mobile Icon */}
         <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
           {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -89,7 +102,7 @@ export default function Header() {
             <Link href="/articles" onClick={() => setIsMenuOpen(false)} className="text-[#4B4B4B] font-['Cambria_Math'] text-xl uppercase">
               Articles
             </Link>
-            <Link href="/evenements" onClick={() => setIsMenuOpen(false)} className="text-[#4B4B4B] font-['Cambria_Math'] text-xl uppercase">
+            <Link href="/events" onClick={() => setIsMenuOpen(false)} className="text-[#4B4B4B] font-['Cambria_Math'] text-xl uppercase">
               L'actualités
             </Link>
             <Link href="/about" onClick={() => setIsMenuOpen(false)} className="text-[#4B4B4B] font-['Cambria_Math'] text-xl uppercase">

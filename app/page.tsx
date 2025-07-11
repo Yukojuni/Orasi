@@ -8,6 +8,13 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 import { Input } from "@/components/ui/input"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 
 export default function HomePage() {
@@ -83,9 +90,11 @@ export default function HomePage() {
 
             <div className="relative">
               <div className="w-full h-[400px] bg-gradient-to-br from-[#4E3AC4] to-[#251C5E] rounded-[124px_0px] flex items-center justify-center">
-                <div className="w-[322px] h-[322px] bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
-                  <span className="text-lg">Image Hero</span>
-                </div>
+                <img
+                  src="/hero.png"
+                  alt="image de présentation"
+                  className="w-[322px] h-[322px] rounded-full object-cover"
+                />
               </div>
             </div>
           </div>
@@ -95,21 +104,24 @@ export default function HomePage() {
       {/* Articles en vedette */}
       <section className="py-16 px-4">
         <div className="container mx-auto">
-          <h2 className="text-5xl font-['Cambria_Math'] text-center text-black mb-12">Derniers articles</h2>
+          <h2 className="text-5xl font-['Cambria_Math'] text-center text-black mb-12">
+            Derniers articles
+          </h2>
 
           {loading ? (
             <p className="text-center">Chargement des articles...</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {articles.map((article, index) => (
-                <ArticleCard
-                  key={article.id}
-                  article={article}
-                  // On ne distingue plus les featured, on applique un style uniforme plus sympa
-                  featured={false}
-                />
-              ))}
-            </div>
+            <Carousel opts={{ align: "start" }} className="mb-8">
+              <CarouselContent>
+                {articles.sort((a, b) => new Date(b.date_publication) - new Date(a.date_publication)).slice(0, 8).map((article) => (
+                  <CarouselItem key={article.id} className="md:basis-1/2 lg:basis-1/4">
+                    <ArticleCard article={article} featured={false} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
           )}
 
           <div className="text-center">
@@ -136,7 +148,7 @@ export default function HomePage() {
           )}
 
           <div className="text-center">
-            <Link href="/articles">
+            <Link href="/events">
               <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
                 Voir nos actualités
               </Button>

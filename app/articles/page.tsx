@@ -8,6 +8,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
 import { supabase } from "@/lib/supabase"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 const themes = ["Tous", "Géopolitique", "Culture", "Politique", "Société", "Opinion"]
 
@@ -103,16 +110,34 @@ export default function ArticlesPage() {
       </section>
 
       {/* Affichage des articles */}
-      <section className="=py-16 px-4">
-        <div className="container mx-auto">
+      <section className="py-16 px-4">
+        <div className="container mx-auto space-y-16">
           {loading ? (
             <p className="text-center text-[#4B4B4B]">Chargement des articles...</p>
           ) : filteredArticles.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredArticles.map((article) => (
-                <ArticleCard key={article.id} article={article} />
-              ))}
-            </div>
+            // On regroupe les articles par thème
+            [...new Set(filteredArticles.map((a) => a.theme))].map((theme) => {
+              const articlesDuTheme = filteredArticles.filter((a) => a.theme === theme)
+
+              return (
+                <div key={theme} className="space-y-6">
+                  <h2 className="text-2xl font-bold text-[#4E3AC4] font-['Work_Sans']">
+                    {theme}
+                  </h2>
+                  <Carousel opts={{ align: "start" }}>
+                    <CarouselContent>
+                      {articlesDuTheme.map((article) => (
+                        <CarouselItem key={article.id} className="md:basis-1/2 lg:basis-1/3">
+                          <ArticleCard article={article} />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious />
+                    <CarouselNext />
+                  </Carousel>
+                </div>
+              )
+            })
           ) : (
             <div className="text-center py-16">
               <p className="text-xl text-[#4B4B4B] font-['Work_Sans']">
