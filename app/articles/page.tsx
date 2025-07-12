@@ -124,10 +124,10 @@ export default function ArticlesPage() {
                   <h2 className="text-2xl font-bold text-[#4E3AC4] font-['Work_Sans']">
                     {theme}
                   </h2>
-                  <Carousel opts={{ align: "start" }}>
+                  <Carousel opts={{ align: "start" }} className="mb-8 px-2">
                     <CarouselContent>
                       {articlesDuTheme.map((article) => (
-                        <CarouselItem key={article.id} className="md:basis-1/2 lg:basis-1/3">
+                        <CarouselItem key={article.id} className="pl-2 md:basis-[45%] lg:basis-[22%] basis-[85%]">
                           <ArticleCard article={article} />
                         </CarouselItem>
                       ))}

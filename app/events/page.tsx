@@ -24,22 +24,22 @@ export default function ActualitesPage() {
       const fakeEvents = [
         {
           id: 1,
-          titre: "Conférence Tech",
-          description: "Explorez les dernières tendances du numérique.",
+          titre: "event 1",
+          description: "Débat.",
           date: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString(),
           lien: "https://example.com/event1"
         },
         {
           id: 2,
-          titre: "Atelier IA",
-          description: "Découvrez les applications concrètes de l'IA.",
+          titre: "event 2",
+          description: "Découvrez l'asso.",
           date: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
           lien: ""
         },
         {
           id: 3,
-          titre: "Webinaire sur la cybersécurité",
-          description: "Comment protéger vos données efficacement.",
+          titre: "event 3",
+          description: "Conférence sur l'actualité",
           date: new Date(new Date().setDate(new Date().getDate() + 10)).toISOString(),
           lien: "https://example.com/event3"
         }
@@ -49,8 +49,8 @@ export default function ActualitesPage() {
       const fakeVideos = [
         {
           id: 1,
-          titre: "Introduction à Orasi",
-          youtube_id: "dQw4w9WgXcQ",
+          titre: "RENAISSANCE : Que propose la liste de Valérie Hayer pour les élections européennes ?",
+          youtube_id: "0SFJyQGNEds",
           date: new Date().toISOString()
         },
         {

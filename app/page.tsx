@@ -111,10 +111,10 @@ export default function HomePage() {
           {loading ? (
             <p className="text-center">Chargement des articles...</p>
           ) : (
-            <Carousel opts={{ align: "start" }} className="mb-8">
+            <Carousel opts={{ align: "start" }} className="mb-8 px-2">
               <CarouselContent>
                 {articles.sort((a, b) => new Date(b.date_publication) - new Date(a.date_publication)).slice(0, 8).map((article) => (
-                  <CarouselItem key={article.id} className="md:basis-1/2 lg:basis-1/4">
+                  <CarouselItem key={article.id} className="pl-2 md:basis-[45%] lg:basis-[22%] basis-[85%]">
                     <ArticleCard article={article} featured={false} />
                   </CarouselItem>
                 ))}

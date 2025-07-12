@@ -44,7 +44,7 @@ export default function ArticleCard({ article, featured = false }: ArticleCardPr
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: article.image_couverture && !featured
-              ? `url(${article.image_couverture})`
+              ? `url(${article.image_couverture})`  
               : `linear-gradient(135deg, #4E3AC4, #251C5E)`
           }}
         />
@@ -67,7 +67,7 @@ export default function ArticleCard({ article, featured = false }: ArticleCardPr
           {/* Titre */}
           <h3
             className={`
-            inline-block px-4 py-2 rounded-tr-lg text-[#4B4B4B] text-sm font-['Cambria_Math'] bg-white
+            inline-block px-4 py-2 rounded-tr-lg text-[#4B4B4B] text-sm font-['Cambria_Math'] bg-white mr-4 max-w-[calc(100%-1rem)] uppercase
             ${featured ? "text-white" : "text-[#4B4B4B]"}
           `}
           >

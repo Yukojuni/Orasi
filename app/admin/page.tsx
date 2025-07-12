@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/components/Providers"
 import { supabase  } from "@/lib/supabase"
 import { Plus, Edit, Trash2, Users, FileText, MessageSquare } from "lucide-react"
+import Link from "next/link"
 
 export default function AdminPage() {
   const { user, loading } = useAuth()
@@ -21,6 +22,14 @@ export default function AdminPage() {
   const [comments, setComments] = useState<any[]>([])
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [editingItem, setEditingItem] = useState<any>(null)
+  const themeColors: Record<string, string> = {
+    Culture: "bg-[#fc6cc4]",
+    Sociologie: "bg-[#ff3131]",
+    Géopolitique: "bg-[#f8ec24]",
+    Société: "bg-[#f87c24]",
+    Opinion: "bg-[#c02f2c]",
+    Politique: "bg-[#70b4e4]",
+  }
   const formatDateForInput = (isoDate: string | null) => {
     if (!isoDate) return "";
     return isoDate.split("T")[0]; // Garde seulement la partie YYYY-MM-DD
@@ -273,12 +282,12 @@ export default function AdminPage() {
                           <div className="text-sm font-medium text-gray-900 max-w-xs truncate">{article.titre}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#4E3AC4] text-white">
+                          <span className={`px-2 inline-flex text-xs font-semibold rounded-full text-white ${themeColors[article.theme] || "bg-gray-300"}`}>
                             {article.theme}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {article.users?.pseudo || "Inconnu"}
+                          {article.pseudo || "Inconnu"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{article.nb_vues}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -388,9 +397,9 @@ export default function AdminPage() {
                       <h3 className="text-lg font-['Cambria_Math'] text-[#4B4B4B] mb-1">
                         {comment.users?.pseudo || "Utilisateur supprimé"}
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <Link href={`/articles/${comment.article_id}`} className="text-sm text-[#4E3AC4] hover:underline">
                         Sur l'article : {comment.articles?.titre || "Article supprimé"}
-                      </p>
+                      </Link>
                       <p className="text-xs text-gray-400">
                         {new Date(comment.date_commentaire).toLocaleDateString("fr-FR")}
                       </p>
