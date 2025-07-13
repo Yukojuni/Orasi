@@ -115,29 +115,33 @@ export default function ArticlesPage() {
           {loading ? (
             <p className="text-center text-[#4B4B4B]">Chargement des articles...</p>
           ) : filteredArticles.length > 0 ? (
-            // On regroupe les articles par thème
-            [...new Set(filteredArticles.map((a) => a.theme))].map((theme) => {
-              const articlesDuTheme = filteredArticles.filter((a) => a.theme === theme)
-
-              return (
-                <div key={theme} className="space-y-6">
-                  <h2 className="text-2xl font-bold text-[#4E3AC4] font-['Work_Sans']">
-                    {theme}
-                  </h2>
-                  <Carousel opts={{ align: "start" }} className="mb-8 px-2">
-                    <CarouselContent>
-                      {articlesDuTheme.map((article) => (
-                        <CarouselItem key={article.id} className="pl-2 md:basis-[45%] lg:basis-[22%] basis-[85%]">
-                          <ArticleCard article={article} />
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                    <CarouselPrevious />
-                    <CarouselNext />
-                  </Carousel>
-                </div>
-              )
-            })
+            selectedTheme === "Tous" ? (
+              // Affichage sans carrousel
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {filteredArticles.map((article) => (
+                  <ArticleCard key={article.id} article={article} />
+                ))}
+              </div>
+            ) : (
+              // Affichage avec carrousel par thème sélectionné
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-[#4E3AC4] font-['Work_Sans']">{selectedTheme}</h2>
+                <Carousel opts={{ align: "start" }} className="mb-8 px-2">
+                  <CarouselContent>
+                    {filteredArticles.map((article) => (
+                      <CarouselItem
+                        key={article.id}
+                        className="pl-2 md:basis-[45%] lg:basis-[22%] basis-[85%]"
+                      >
+                        <ArticleCard article={article} />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
+              </div>
+            )
           ) : (
             <div className="text-center py-16">
               <p className="text-xl text-[#4B4B4B] font-['Work_Sans']">

@@ -20,6 +20,28 @@ import {
 export default function HomePage() {
   const [articles, setArticles] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [evenements, setEvenements] = useState<any[]>([])
+
+
+
+   useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true)
+
+      const { data: eventsData, error: eventsError } = await supabase
+        .from("evenements")
+        .select("*")
+        .order("date", { ascending: true })
+        .limit (3)
+
+      if (eventsError) console.error(eventsError)
+      else setEvenements(eventsData || [])
+
+      setLoading(false)
+    }
+    fetchData()
+  }, [])
+
 
   useEffect(() => {
     const fetchFeaturedArticles = async () => {
@@ -87,13 +109,16 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
+            <div className="relative w-full h-[500px] md:h-[300px] lg:h-[400px]">
+              {/* Background avec dégradé */}
+              <div className="absolute top-0 right-0 w-4/5 h-full bg-gradient-to-br from-[#4E3AC4] to-[#251C5E] rounded-[124px_0px] z-0"></div>
 
-            <div className="relative">
-              <div className="w-full h-[400px] bg-gradient-to-br from-[#4E3AC4] to-[#251C5E] rounded-[124px_0px] flex items-center justify-center">
+              {/* Statue superposée */}
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/6 w-2/3 md:w-2/3 z-10">
                 <img
                   src="/hero.png"
                   alt="image de présentation"
-                  className="w-[322px] h-[322px] rounded-full object-cover"
+                  className="w-full h-auto object-contain rounded drop-shadow-xl"
                 />
               </div>
             </div>
@@ -135,25 +160,29 @@ export default function HomePage() {
       </section>
 
       {/* Actualités */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 bg-[#F9F9F9]">
         <div className="container mx-auto">
-          <h2 className="text-5xl font-['Cambria_Math'] text-center text-black mb-12">Les actualités</h2>
-          3 prochains evenements à venir
-          CTA
+          <h2 className="text-5xl font-['Cambria_Math'] text-center text-black mb-12">Prochains événements</h2>
+
           {loading ? (
-            <p className="text-center">Chargement des actualités...</p>
+            <p className="text-center">Chargement des événements...</p>
+          ) : evenements.length === 0 ? (
+            <p className="text-center text-gray-500">Aucun événement à venir</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {evenements.map((event) => (
+                <div key={event.id} className="bg-white rounded-xl shadow-md p-6">
+                  <h3 className="text-2xl font-['Cambria_Math'] mb-2 text-[#4B4B4B]">{event.titre}</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                  </p>
+                  <p className="text-[#4B4B4B] mb-4">{event.description}</p>
+                  <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
+                    {event.lien ? <a href={event.lien} target="_blank">S'inscrire</a> : "En savoir plus"}
+                  </Button>
+                </div>
+              ))}
             </div>
           )}
-
-          <div className="text-center">
-            <Link href="/events">
-              <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
-                Voir nos actualités
-              </Button>
-            </Link>
-          </div>
         </div>
       </section>
 

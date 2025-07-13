@@ -17,76 +17,22 @@ export default function ActualitesPage() {
 
 
   useEffect(() => {
-    const simulateData = async () => {
-      setLoading(true)
-
-      // Simule des événements
-      const fakeEvents = [
-        {
-          id: 1,
-          titre: "event 1",
-          description: "Débat.",
-          date: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString(),
-          lien: "https://example.com/event1"
-        },
-        {
-          id: 2,
-          titre: "event 2",
-          description: "Découvrez l'asso.",
-          date: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString(),
-          lien: ""
-        },
-        {
-          id: 3,
-          titre: "event 3",
-          description: "Conférence sur l'actualité",
-          date: new Date(new Date().setDate(new Date().getDate() + 10)).toISOString(),
-          lien: "https://example.com/event3"
-        }
-      ]
-
-      // Simule des vidéos
-      const fakeVideos = [
-        {
-          id: 1,
-          titre: "RENAISSANCE : Que propose la liste de Valérie Hayer pour les élections européennes ?",
-          youtube_id: "0SFJyQGNEds",
-          date: new Date().toISOString()
-        },
-        {
-          id: 2,
-          titre: "ITW : Le rap était-il mieux avant ?",
-          youtube_id: "KsZxUd5ihmM?si=_QkCS24K31LXC9Ne",
-          date: new Date(new Date().setDate(new Date().getDate() - 2)).toISOString()
-        }
-      ]
-
-      setEvenements(fakeEvents)
-      setVideos(fakeVideos)
-      setLoading(false)
-    }
-
-    simulateData()
-  }, [])
-
-
-  useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
 
-      // Récupère les événements à venir
       const { data: eventsData, error: eventsError } = await supabase
         .from("evenements")
         .select("*")
-        .gte("date", new Date().toISOString())
         .order("date", { ascending: true })
-        .limit(3)
+        
+      console.log("Événements:", eventsData, eventsError)
 
-      // Récupère les vidéos (YouTube ou autre source)
       const { data: videosData, error: videosError } = await supabase
         .from("videos")
         .select("*")
         .order("date", { ascending: false })
+
+      console.log("Vidéos:", videosData, videosError)
 
       if (eventsError) console.error(eventsError)
       else setEvenements(eventsData || [])
@@ -99,6 +45,7 @@ export default function ActualitesPage() {
 
     fetchData()
   }, [])
+
 
   return (
     <div className="min-h-screen">
@@ -139,36 +86,6 @@ export default function ActualitesPage() {
           </div>
         </div>
       </section>
-
-
-      {/* SECTION - Événements à venir */}
-      <section className="py-16 px-4 bg-[#F9F9F9]">
-        <div className="container mx-auto">
-          <h2 className="text-5xl font-['Cambria_Math'] text-center text-black mb-12">Prochains événements</h2>
-
-          {loading ? (
-            <p className="text-center">Chargement des événements...</p>
-          ) : evenements.length === 0 ? (
-            <p className="text-center text-gray-500">Aucun événement à venir</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {evenements.map((event) => (
-                <div key={event.id} className="bg-white rounded-xl shadow-md p-6">
-                  <h3 className="text-2xl font-['Cambria_Math'] mb-2 text-[#4B4B4B]">{event.titre}</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    {format(new Date(event.date), "EEEE d MMMM yyyy 'à' HH:mm")}
-                  </p>
-                  <p className="text-[#4B4B4B] mb-4">{event.description}</p>
-                  <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
-                    {event.lien ? <a href={event.lien} target="_blank">S'inscrire</a> : "En savoir plus"}
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
       {/* SECTION - Vidéos récentes */}
       <section className="py-16 px-4">
         <div className="container mx-auto">

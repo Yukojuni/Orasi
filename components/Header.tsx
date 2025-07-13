@@ -27,7 +27,7 @@ export default function Header() {
       <div className="container mx-auto px-4 h-full flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="text-4xl font-bold text-[#4B4B4B]">
-          ORASI
+          <img src="/logo.png" alt="Logo ORASI" className="h-20" />
         </Link>
 
         {/* Navigation Desktop */}
