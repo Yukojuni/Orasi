@@ -82,6 +82,7 @@ export default function AdminPage() {
           titre: formData.titre,
           contenu: formData.contenu,
           theme: formData.theme,
+          subsection: formData.subsection || null,
           auteur_id: user?.id,
           image_couverture: formData.image_couverture,
           date_publication: formData.date_publication ? new Date(formData.date_publication) : new Date(),
@@ -132,6 +133,7 @@ export default function AdminPage() {
         titre: formData.titre,
         contenu: formData.contenu,
         theme: formData.theme,
+        subsection: formData.subsection || null,
         image_couverture: formData.image_couverture || null,
       };
 
@@ -430,6 +432,7 @@ export default function AdminPage() {
                     titre: formData.get("titre"),
                     contenu: formData.get("contenu"),
                     theme: formData.get("theme"),
+                    subsection: formData.get("subsection"),
                     image_couverture: formData.get("image_couverture"),
                     date_publication: formData.get("date_publication"),
                   })
@@ -460,6 +463,18 @@ export default function AdminPage() {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div>
+                  <Label htmlFor="subsection" className="font-['Cambria_Math'] uppercase">
+                    Subsection
+                  </Label>
+                  <Input
+                    id="subsection"
+                    name="subsection"
+                    type="text"
+                    placeholder="Ex: Sociologie, Enjeux..."
+                    className="border-[#4E3AC4] rounded-none rounded-br-xl"
+                  />
+                </div>
 
                   <div>
                     <Label htmlFor="image_couverture" className="font-['Cambria_Math'] uppercase">
@@ -526,6 +541,7 @@ export default function AdminPage() {
                     titre: formData.get("titre"),
                     contenu: formData.get("contenu"),
                     theme: formData.get("theme"),
+                    subsection: formData.get("subsection"),
                     image_couverture: formData.get("image_couverture"),
                     date_publication: formData.get("date_publication"),
                   })
@@ -551,6 +567,19 @@ export default function AdminPage() {
                         <SelectItem value="Opinion">Opinion</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="subsection" className="font-['Cambria_Math'] uppercase">
+                      Subsection
+                    </Label>
+                    <Input
+                      id="subsection"
+                      name="subsection"
+                      type="text"
+                      defaultValue={editingItem.subsection || ""}
+                      placeholder="Ex: Sociologie, Enjeux..."
+                      className="border-[#4E3AC4] rounded-none rounded-br-xl"
+                    />
                   </div>
 
                   <div>

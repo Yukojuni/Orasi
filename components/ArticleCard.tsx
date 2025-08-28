@@ -34,69 +34,55 @@ export default function ArticleCard({ article, featured = false }: ArticleCardPr
     <Link href={`/articles/${article.id}`}>
       <div
         className={`
-        relative overflow-hidden rounded-tl-xl rounded-br-xl shadow-lg hover:shadow-xl transition-shadow
-        ${featured ? "h-[486px]" : "h-[406px]"} w-full
-        ${featured ? "bg-gradient-to-br from-[#4E3AC4] to-black/75" : "bg-white"}
-      `}
-      >
-        {/* Image de couverture ou dégradé par défaut */}
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: article.image_couverture && !featured
-              ? `url(${article.image_couverture})`  
-              : `linear-gradient(135deg, #4E3AC4, #251C5E)`
-          }}
-        />
-        {/* Contenu */}
-        <div
-          className={`
-          absolute bottom-0 left-0 right-0 p-6
+          relative overflow-hidden rounded-2xl shadow-lg
+          border border-gray-200 bg-white
+          transition-transform duration-300 ease-out
+          hover:scale-[1.03] hover:rotate-[1deg] hover:shadow-2xl
+          ${featured ? "h-[486px]" : "h-[406px]"} w-full
         `}
-        >
-          {/* Tag thème */}
+      >
+        {/* Image de couverture */}
+        <div className="relative h-1/2 w-full overflow-hidden">
+          <img
+            src={article.image_couverture || "/default-article.jpg"}
+            alt={article.titre}
+            className="w-full h-full object-cover"
+          />
+          {/* Overlay dégradé pour lisibilité */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+          {/* Tag Thème en overlay */}
           <div
             className={`
-            inline-block px-4 py-2 rounded-t-lg text-white text-sm font-['Cambria_Math'] uppercase
-            ${getThemeColor(article.theme)}
-          `}
+              absolute bottom-2 left-2 px-3 py-1 rounded-lg text-white text-xs font-['Cambria_Math'] uppercase shadow-md
+              ${getThemeColor(article.theme)}
+            `}
           >
             {article.theme}
           </div>
+        </div>
 
+        {/* Contenu Texte */}
+        <div className="p-4 flex flex-col justify-between h-1/2">
           {/* Titre */}
           <h3
-            className={`
-            inline-block px-4 py-2 rounded-tr-lg text-[#4B4B4B] text-sm font-['Cambria_Math'] bg-white mr-4 max-w-[calc(100%-1rem)] uppercase
-            ${featured ? "text-white" : "text-[#4B4B4B]"}
-          `}
+            className={`font-bold leading-tight mb-2 line-clamp-2 ${
+              featured ? "text-xl md:text-2xl" : "text-lg"
+            }`}
           >
             {article.titre}
           </h3>
 
-          {/* Description */}
-          <p
-            className={`
-            inline-block px-4 py-2 rounded-r-lg text-[#4B4B4B] text-sm font-['Cambria_Math'] bg-white
-            ${featured ? "text-white/90" : "text-[#4B4B4B]"}
-          `}
-          >
+          {/* Extrait */}
+          <p className="text-sm text-gray-600 line-clamp-3 mb-3">
             {article.contenu.substring(0, 120)}...
           </p>
 
           {/* Métadonnées */}
-          <div
-            className={`
-            inline-block px-4 py-2 rounded-b-lg text-[#4B4B4B] text-sm font-['Cambria_Math'] bg-white
-            ${featured ? "text-white/80" : "text-[#4B4B4B]/70"}
-          `}
-          >
-            <div className="flex items-center space-x-4">
-              <span className="flex items-center space-x-1">
-                <User size={12} />
-                <span className="font-['Cambria_Math'] uppercase">{article.auteur}</span>
-              </span>
-            </div>
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span className="flex items-center gap-1">
+              <User size={14} />
+              {article.auteur}
+            </span>
           </div>
         </div>
       </div>

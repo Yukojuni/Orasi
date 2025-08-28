@@ -3,134 +3,121 @@
 import { useState, useEffect } from "react"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
-import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase"
-import { format } from "date-fns"
-import Link from "next/link"
 import FullCalendar from "@fullcalendar/react"
 import dayGridPlugin from "@fullcalendar/daygrid"
+import interactionPlugin from "@fullcalendar/interaction"
+import EventCard from "@/components/EventCard"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 export default function ActualitesPage() {
   const [evenements, setEvenements] = useState<any[]>([])
-  const [videos, setVideos] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
-
       const { data: eventsData, error: eventsError } = await supabase
         .from("evenements")
         .select("*")
         .order("date", { ascending: true })
-        
-      console.log("Événements:", eventsData, eventsError)
-
-      const { data: videosData, error: videosError } = await supabase
-        .from("videos")
-        .select("*")
-        .order("date", { ascending: false })
-
-      console.log("Vidéos:", videosData, videosError)
 
       if (eventsError) console.error(eventsError)
       else setEvenements(eventsData || [])
-
-      if (videosError) console.error(videosError)
-      else setVideos(videosData || [])
-
       setLoading(false)
     }
-
     fetchData()
   }, [])
 
+  const calendarButtonClass = `
+    bg-[#F9F9F9] text-[#4B4B4B] px-3 py-1 rounded-xl
+    hover:bg-[#4E3AC4] hover:text-white transition-colors
+  `
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <Header />
 
-      {/* SECTION - Calendrier */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4">
         <div className="container mx-auto">
-          <h2 className="text-4xl font-['Cambria_Math'] text-center text-black mb-8">Calendrier des événements</h2>
-          <div className="bg-white rounded-2xl shadow-lg p-4 max-w-3xl mx-auto border border-gray-200">
+          <h2 className="text-5xl font-bold text-gray-800 mb-8 text-center">
+            Calendrier des événements
+          </h2>
+
+          <div className="bg-white rounded-3xl shadow-xl p-6 max-w-5xl mx-auto border border-gray-200">
             <FullCalendar
-              plugins={[dayGridPlugin]}
+              plugins={[dayGridPlugin, interactionPlugin]}
               initialView="dayGridMonth"
+              locale="fr"
               height="auto"
               events={evenements.map(e => ({
                 title: e.titre,
                 date: e.date,
-                url: e.lien || undefined
+                url: e.lien || undefined,
               }))}
-              eventColor="#4E3AC4"
-              eventTextColor="#fff"
-              dayMaxEventRows={true}
+              eventContent={(arg) => (
+                <div className="flex flex-col p-2 bg-[#4E3AC4] text-white rounded-lg shadow-md hover:scale-105 transition-transform">
+                  <span className="font-bold text-sm">{arg.event.title}</span>
+                </div>
+              )}
+              dayMaxEventRows={3}
               fixedWeekCount={false}
               headerToolbar={{
-                left: "prev,next",
+                left: "prev,next today",
                 center: "title",
-                right: ""
+                right: "dayGridMonth"
               }}
-              aspectRatio={1.5}
-              contentHeight={400}
+              buttonText={{
+                today: "Aujourd’hui",
+                month: "Mois"
+              }}
+              aspectRatio={1.4}
+              contentHeight={500}
               eventClick={(info) => {
                 if (info.event.url) {
                   info.jsEvent.preventDefault()
                   window.open(info.event.url, "_blank")
                 }
               }}
+              dayCellClassNames="rounded-xl border border-gray-100 overflow-hidden hover:bg-gray-50 transition-colors"
             />
           </div>
         </div>
       </section>
-      {/* SECTION - Vidéos récentes */}
+      
+      {/* SECTION EVENEMENTS */}
       <section className="py-16 px-4">
         <div className="container mx-auto">
-          <h2 className="text-5xl font-['Cambria_Math'] text-center text-black mb-12">Nos vidéos</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-800 mb-12">
+            Tous les événements
+          </h2>
 
           {loading ? (
-            <p className="text-center">Chargement des vidéos...</p>
-          ) : videos.length === 0 ? (
-            <p className="text-center text-gray-500">Aucune vidéo pour le moment</p>
+            <p className="text-center">Chargement...</p>
+          ) : evenements.length === 0 ? (
+            <p className="text-center text-gray-500">Aucun événement à venir</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {videos.map((video) => (
-                <div key={video.id} className="bg-white shadow-md rounded-xl overflow-hidden">
-                  <div className="aspect-video">
-                    <iframe
-                      className="w-full h-full"
-                      src={`https://www.youtube.com/embed/${video.youtube_id}`}
-                      title={video.titre}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-xl font-['Cambria_Math'] text-[#4B4B4B]">{video.titre}</h3>
-                    <p className="text-sm text-gray-600">
-                      Publiée le {format(new Date(video.date), "d MMMM yyyy")}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <Carousel opts={{ align: "start" }} className="mb-8 px-4 overflow-visible">
+              <CarouselContent>
+                {evenements.map(event => (
+                  <CarouselItem
+                    key={event.id}
+                    className="pl-10 md:basis-[45%] lg:basis-[30%] basis-[85%] pb-8 py-4 "
+                  >
+                    <EventCard evenement={event} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
           )}
-
-          <div className="text-center mt-12">
-            <a
-              href="https://www.youtube.com/@Orasi.France"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
-                Voir toutes nos vidéos
-              </Button>
-            </a>
-          </div>
         </div>
       </section>
 

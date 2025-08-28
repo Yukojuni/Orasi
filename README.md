@@ -56,7 +56,7 @@ Application web complète pour l'association étudiante ORASI, plateforme de dif
 \`\`\`bash
 git clone [url-du-repo]
 cd orasi-app
-npm install
+npm install --legacy-peer-deps
 \`\`\`
 
 ### 2. Configuration Supabase

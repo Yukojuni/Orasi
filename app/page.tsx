@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import ArticleCard from "@/components/ArticleCard"
+import EventCard from "@/components/EventCard"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase"
@@ -16,32 +17,26 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 
-
 export default function HomePage() {
   const [articles, setArticles] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [evenements, setEvenements] = useState<any[]>([])
 
-
-
-   useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
-
       const { data: eventsData, error: eventsError } = await supabase
         .from("evenements")
         .select("*")
         .order("date", { ascending: true })
-        .limit (3)
+        .limit(3)
 
       if (eventsError) console.error(eventsError)
       else setEvenements(eventsData || [])
-
       setLoading(false)
     }
     fetchData()
   }, [])
-
 
   useEffect(() => {
     const fetchFeaturedArticles = async () => {
@@ -60,87 +55,169 @@ export default function HomePage() {
           auteur_id (pseudo, avatar_url)
         `)
         .order("date_publication", { ascending: false })
-        .limit(4)
+        .limit(8)
 
-      if (error) {
-        console.error("Erreur récupération articles :", error)
-      } else {
-        const articlesFormattés = data.map((a) => ({
+      if (error) console.error("Erreur récupération articles :", error)
+      else {
+        const formatted = data.map(a => ({
           ...a,
           auteur: a.auteur_id?.pseudo || "Auteur inconnu",
           avatar: a.auteur_id?.avatar_url || null,
         }))
-        setArticles(articlesFormattés)
+        setArticles(formatted)
       }
       setLoading(false)
     }
-
     fetchFeaturedArticles()
   }, [])
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen font-sans bg-white overflow-x-hidden">
       <Header />
 
-      {/* Hero Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-5xl font-['Cambria_Math'] text-[#4B4B4B] mb-6 leading-tight">
-                Explore, pense, échange avec ORASI
-              </h1>
-              <p className="text-lg text-[#4B4B4B] mb-8 font-['Work_Sans']">
-                L'association étudiante qui donne du sens aux débats et à la culture générale.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/about">
-                  <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
-                  Devenir membre
-                  </Button>
-                </Link>
-                <Link href="/articles">
-                  <Button
-                    variant="outline"
-                    className="border-[#4E3AC4] text-[#4B4B4B] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase"
-                  >
-                    Lire un article
-                  </Button>
-                </Link>
-              </div>
-            </div>
-            <div className="relative w-full h-[500px] md:h-[300px] lg:h-[400px]">
-              {/* Background avec dégradé */}
-              <div className="absolute top-0 right-0 w-4/5 h-full bg-gradient-to-br from-[#4E3AC4] to-[#251C5E] rounded-[124px_0px] z-0"></div>
-
-              {/* Statue superposée */}
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/6 w-2/3 md:w-2/3 z-10">
+      {/* SECTION ARTICLES + ÉVÉNEMENTS */}
+      <section className="py-8 px-4 bg-white">
+        <div className="container mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
+          
+          {/* === ARTICLE PRINCIPAL === */}
+          <div className="lg:col-span-2 relative">
+            <Link href={`/articles/${articles[0]?.id}`} className="block">
+              <div className="relative w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden">
                 <img
-                  src="/hero.png"
-                  alt="image de présentation"
-                  className="w-full h-auto object-contain rounded drop-shadow-xl"
+                  src={articles[0]?.image_couverture || "/default.jpg"}
+                  alt={articles[0]?.titre}
+                  className="w-full h-full object-cover"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               </div>
-            </div>
+              <div className="mt-4">
+                <span className="text-sm uppercase font-bold text-[#4E3AC4]">
+                  {articles[0]?.theme}
+                </span>
+                <h1 className="text-3xl md:text-4xl font-bold text-[#4B4B4B] leading-tight mt-2">
+                  {articles[0]?.titre}
+                </h1>
+                <p className="text-gray-700 mt-2 line-clamp-3">
+                  {articles[0]?.contenu?.substring(0, 150)}...
+                </p>
+              </div>
+            </Link>
           </div>
+
+          {/* === ARTICLES SECONDAIRES === */}
+          <div className="lg:col-span-1 flex flex-col gap-6">
+            {articles.slice(1, 6).map((article) => (
+              <Link href={`/articles/${article.id}`} key={article.id} className="flex gap-4">
+                {article.image_couverture && (
+                  <img
+                    src={article.image_couverture}
+                    alt={article.titre}
+                    className="w-24 h-24 object-cover rounded"
+                  />
+                )}
+                <div>
+                  <h3 className="font-semibold text-lg text-[#4B4B4B] leading-snug line-clamp-2">
+                    {article.titre}
+                  </h3>
+                  <p className="text-sm text-gray-600 line-clamp-2">{article.contenu.substring(0, 80)}...</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* === ÉVÉNEMENT À VENIR === */}
+          <div className="lg:col-span-1 relative">
+            {evenements[0] ? (
+              <Link href={`/events/${evenements[0].id}`} className="block">
+                {/* Image de l'événement */}
+                <div className="relative w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden">
+                  <img
+                    src={evenements[0].lien_image || "/default-event.jpg"}
+                    alt={evenements[0].titre}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Overlay dégradé pour lisibilité */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                </div>
+
+                {/* Contenu texte */}
+                <div className="mt-4">
+                  <span className="text-sm uppercase font-bold text-[#4E3AC4]">
+                    À venir
+                  </span>
+                  <h3 className="text-3xl md:text-4xl font-bold text-[#4B4B4B] leading-tight mt-2 line-clamp-2">
+                    {evenements[0].titre}
+                  </h3>
+                  <p className="text-gray-700 mt-2 line-clamp-3">
+                    {evenements[0].description}
+                  </p>
+                  {evenements[0].lien && (
+                    <Button className="mt-4 bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl">
+                      <a href={evenements[0].lien} target="_blank" rel="noreferrer">
+                        S'inscrire
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </Link>
+            ) : (
+              <p className="text-gray-500 text-center">Aucun événement à venir</p>
+            )}
+          </div>
+
         </div>
       </section>
 
-      {/* Articles en vedette */}
+      {/* ARTICLES EN CARROUSEL */}
+    <section className="py-16 bg-white">
+      <div className="container mx-auto overflow-visible">
+        <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-800 mb-12">
+          Derniers articles
+        </h2>
+
+        {loading ? (
+          <p className="text-center">Chargement des articles...</p>
+        ) : (
+          <Carousel opts={{ align: "start" }} className="overflow-visible">
+            <CarouselContent className="overflow-visible">
+              {articles.slice(0, 6).map(article => (
+                <CarouselItem
+                  key={article.id}
+                  className="pl-2 md:basis-[45%] lg:basis-[22%] basis-[85%]"
+                >
+                  <ArticleCard article={article} featured={false} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        )}
+      </div>
+    </section>
+
+
+
+      {/* SECTION EVENEMENTS */}
       <section className="py-16 px-4">
         <div className="container mx-auto">
-          <h2 className="text-5xl font-['Cambria_Math'] text-center text-black mb-12">
-            Derniers articles
+          <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-800 mb-12">
+            Prochains événements
           </h2>
 
           {loading ? (
-            <p className="text-center">Chargement des articles...</p>
+            <p className="text-center">Chargement...</p>
+          ) : evenements.length === 0 ? (
+            <p className="text-center text-gray-500">Aucun événement à venir</p>
           ) : (
-            <Carousel opts={{ align: "start" }} className="mb-8 px-2">
+            <Carousel opts={{ align: "start" }} className="mb-8 px-4 overflow-visible">
               <CarouselContent>
-                {articles.sort((a, b) => new Date(b.date_publication) - new Date(a.date_publication)).slice(0, 8).map((article) => (
-                  <CarouselItem key={article.id} className="pl-2 md:basis-[45%] lg:basis-[22%] basis-[85%]">
-                    <ArticleCard article={article} featured={false} />
+                {evenements.map(event => (
+                  <CarouselItem
+                    key={event.id}
+                    className="pl-10 md:basis-[45%] lg:basis-[30%] basis-[85%] pb-8 py-4 "
+                  >
+                    <EventCard evenement={event} />
                   </CarouselItem>
                 ))}
               </CarouselContent>
@@ -148,96 +225,9 @@ export default function HomePage() {
               <CarouselNext />
             </Carousel>
           )}
-
-          <div className="text-center">
-            <Link href="/articles">
-              <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
-                Voir plus d'articles
-              </Button>
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* Actualités */}
-      <section className="py-16 px-4 bg-[#F9F9F9]">
-        <div className="container mx-auto">
-          <h2 className="text-5xl font-['Cambria_Math'] text-center text-black mb-12">Prochains événements</h2>
-
-          {loading ? (
-            <p className="text-center">Chargement des événements...</p>
-          ) : evenements.length === 0 ? (
-            <p className="text-center text-gray-500">Aucun événement à venir</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {evenements.map((event) => (
-                <div key={event.id} className="bg-white rounded-xl shadow-md p-6">
-                  <h3 className="text-2xl font-['Cambria_Math'] mb-2 text-[#4B4B4B]">{event.titre}</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                  </p>
-                  <p className="text-[#4B4B4B] mb-4">{event.description}</p>
-                  <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
-                    {event.lien ? <a href={event.lien} target="_blank">S'inscrire</a> : "En savoir plus"}
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-
-      {/* Section À propos */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="order-2 lg:order-1">
-              <div className="w-full h-[400px] bg-gray-300 rounded-xl flex items-center justify-center text-gray-600">
-                <span className="text-lg">Image À propos</span>
-              </div>
-            </div>
-
-            <div className="order-1 lg:order-2">
-              <h2 className="text-5xl font-['Cambria_Math'] text-[#4B4B4B] mb-6">À propos</h2>
-              <p className="text-lg text-[#4B4B4B] mb-8 font-['Work_Sans']">
-                Des étudiants passionnés par les grandes questions contemporaines de ce siècle et par tous les sujets
-                inter-temporels dont la complexité intensifie l'envie d'en apprendre plus.
-              </p>
-              <p className="text-lg text-[#4B4B4B] mb-8 font-['Work_Sans']">
-                Orasi, du grec όραση se traduit en français par "vision", notre vision du monde, des phénomènes voire de
-                ce que devraient être certaines choses.
-              </p>
-              <Link href="/about">
-                <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
-                  En savoir plus
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-      {/* Newsletter */}
-      <section className="py-16 px-4 bg-white">
-        <div className="container mx-auto text-center">
-          <h2 className="text-5xl font-['Cambria_Math'] text-[#4B4B4B] mb-4">Newsletter</h2>
-          <p className="text-lg text-[#4B4B4B] mb-8 font-['Work_Sans']">
-            Restez informé de nos dernières publications et événements
-          </p>
-
-          <div className="max-w-md mx-auto flex gap-2">
-            <Input
-              type="email"
-              placeholder="Ton email"
-              className="border-[#4E3AC4] text-[#4B4B4B] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math']"
-            />
-            <Button className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
-              S'inscrire
-            </Button>
-          </div>
-        </div>
-      </section>
 
       <Footer />
     </div>
