@@ -133,15 +133,27 @@ export default function Header() {
               </Link>
             ))}
             {user ? (
-              <Link href="/profile" onClick={() => setIsMenuOpen(false)}>
-                <Button
-                  variant="outline"
-                  className="w-40 border-[#4E3AC4] text-[#4B4B4B] rounded-xl font-sans uppercase transition-all hover:scale-105"
-                >
-                  Profil
-                </Button>
-              </Link>
-            ) : (
+              <>
+                {user.user_metadata?.role === "admin" && (
+                  <Link href="/admin">
+                    <Button
+                      variant="outline"
+                      className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-xl font-sans uppercase transition-all hover:scale-105"
+                    >
+                      Admin
+                    </Button>
+                  </Link>
+                )}
+                <Link href="/profile">
+                  <Button
+                    variant="outline"
+                    className="border-[#4E3AC4] text-[#4B4B4B] hover:bg-[#4E3AC4]/10 rounded-xl font-sans uppercase transition-all hover:scale-105"
+                  >
+                    Profil
+                  </Button>
+                </Link>
+              </>
+            ): (
               <>
                 <Link href="https://www.helloasso.com/associations/orasi/adhesions/formulaire-d-adhesion-en-tant-que-membre-actif-orasi-8" onClick={() => setIsMenuOpen(false)}>
                   <Button
