@@ -37,8 +37,7 @@ export default function ArticlesPage() {
           date_publication,
           nb_vues,
           image_couverture,
-          auteur_id,
-          auteur_id (pseudo, avatar_url),
+          auteur,
           subsection
         `)
 
@@ -46,8 +45,7 @@ export default function ArticlesPage() {
       else {
         const articlesFormattés = data.map(a => ({
           ...a,
-          auteur: a.auteur_id?.pseudo || "Auteur inconnu",
-          avatar: a.auteur_id?.avatar_url || null,
+          auteur: a.auteur || "Inconnu" ,
         }))
         setArticles(articlesFormattés)
       }
@@ -67,15 +65,23 @@ export default function ArticlesPage() {
     return matchesTheme && matchesSearch
   })
 
-  // Grouper par subsection si un thème est sélectionné
-  const groupedArticlesBySubsection = selectedTheme === "Tous"
-    ? {}
-    : filteredArticles.reduce((acc: Record<string, any[]>, article) => {
-        const key = article.subsection || "Sans subsection"
-        if (!acc[key]) acc[key] = []
-        acc[key].push(article)
-        return acc
-      }, {})
+  // Vérifier si au moins un article a une subsection
+  const hasSubsectionArticles =
+    selectedTheme !== "Tous" &&
+    filteredArticles.some(article => article.subsection && article.subsection.trim() !== "")
+
+  // Trier par date décroissante
+  const sortedArticles = [...filteredArticles].sort(
+    (a, b) => new Date(b.date_publication).getTime() - new Date(a.date_publication).getTime()
+  )
+
+  // Grouper par subsection si nécessaire
+  const groupedArticlesBySubsection = sortedArticles.reduce((acc: Record<string, any[]>, article) => {
+    const key = article.subsection || "Sans subsection"
+    if (!acc[key]) acc[key] = []
+    acc[key].push(article)
+    return acc
+  }, {})
 
   return (
     <div className="min-h-screen font-sans bg-white overflow-x-hidden">
@@ -119,19 +125,13 @@ export default function ArticlesPage() {
         <div className="container mx-auto space-y-16">
           {loading ? (
             <p className="text-center text-[#4B4B4B]">Chargement des articles...</p>
-          ) : filteredArticles.length === 0 ? (
+          ) : sortedArticles.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-xl text-[#4B4B4B] font-sans">
                 Aucun article trouvé pour votre recherche.
               </p>
             </div>
-          ) : selectedTheme === "Tous" ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {filteredArticles.map(article => (
-                <ArticleCard key={article.id} article={article} />
-              ))}
-            </div>
-          ) : (
+          ) : hasSubsectionArticles ? (
             Object.entries(groupedArticlesBySubsection).map(([subsectionTitle, articlesInGroup]) => (
               <div key={subsectionTitle} className="space-y-6">
                 {subsectionTitle !== "Sans subsection" && (
@@ -155,6 +155,13 @@ export default function ArticlesPage() {
                 </Carousel>
               </div>
             ))
+          ) : (
+            // Affichage classique pour "Tous" ou si aucun article n’a de subsection
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {sortedArticles.map(article => (
+                <ArticleCard key={article.id} article={article} />
+              ))}
+            </div>
           )}
         </div>
       </section>

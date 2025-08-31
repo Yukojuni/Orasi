@@ -51,8 +51,7 @@ export default function HomePage() {
           date_publication,
           nb_vues,
           image_couverture,
-          auteur_id,
-          auteur_id (pseudo, avatar_url)
+          auteur
         `)
         .order("date_publication", { ascending: false })
         .limit(8)
@@ -61,8 +60,7 @@ export default function HomePage() {
       else {
         const formatted = data.map(a => ({
           ...a,
-          auteur: a.auteur_id?.pseudo || "Auteur inconnu",
-          avatar: a.auteur_id?.avatar_url || null,
+          auteur : a.auteur || "Inconnu",
         }))
         setArticles(formatted)
       }
@@ -169,34 +167,44 @@ export default function HomePage() {
       </section>
 
       {/* ARTICLES EN CARROUSEL */}
-    <section className="py-16 bg-white">
-      <div className="container mx-auto overflow-visible">
-        <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-800 mb-12">
-          Derniers articles
-        </h2>
+      <section className="py-16 bg-white">
+        <div className="container mx-auto overflow-visible">
+          <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-800 mb-12">
+            Derniers articles
+          </h2>
 
-        {loading ? (
-          <p className="text-center">Chargement des articles...</p>
-        ) : (
-          <Carousel opts={{ align: "start" }} className="overflow-visible">
-            <CarouselContent className="overflow-visible">
-              {articles.slice(0, 6).map(article => (
-                <CarouselItem
-                  key={article.id}
-                  className="pl-2 md:basis-[45%] lg:basis-[22%] basis-[85%]"
+          {loading ? (
+            <p className="text-center">Chargement des articles...</p>
+          ) : (
+            <>
+              <Carousel opts={{ align: "start" }} className="overflow-visible">
+                <CarouselContent className="overflow-visible">
+                  {articles.slice(0, 6).map(article => (
+                    <CarouselItem
+                      key={article.id}
+                      className="pl-2 md:basis-[45%] lg:basis-[22%] basis-[85%]"
+                    >
+                      <ArticleCard article={article} featured={false} />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
+
+              {/* Bouton Voir plus d'articles */}
+              <div className="text-center mt-8">
+                <a
+                  href="/articles"
+                  className="inline-block px-6 py-3 bg-[#4E3AC4] text-white rounded-2xl shadow-md hover:bg-[#3d2ea3] font-sans uppercase transition"
                 >
-                  <ArticleCard article={article} featured={false} />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
-        )}
-      </div>
-    </section>
-
-
+                  Voir plus d'articles
+                </a>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
 
       {/* SECTION EVENEMENTS */}
       <section className="py-16 px-4">
@@ -210,24 +218,35 @@ export default function HomePage() {
           ) : evenements.length === 0 ? (
             <p className="text-center text-gray-500">Aucun événement à venir</p>
           ) : (
-            <Carousel opts={{ align: "start" }} className="mb-8 px-4 overflow-visible">
-              <CarouselContent>
-                {evenements.map(event => (
-                  <CarouselItem
-                    key={event.id}
-                    className="pl-10 md:basis-[45%] lg:basis-[30%] basis-[85%] pb-8 py-4 "
-                  >
-                    <EventCard evenement={event} />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
+            <>
+              <Carousel opts={{ align: "start" }} className="mb-8 px-4 overflow-visible">
+                <CarouselContent>
+                  {evenements.map(event => (
+                    <CarouselItem
+                      key={event.id}
+                      className="pl-10 md:basis-[45%] lg:basis-[30%] basis-[85%] pb-8 py-4"
+                    >
+                      <EventCard evenement={event} />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
+
+              {/* Bouton Voir tous les événements */}
+              <div className="text-center mt-4">
+                <a
+                  href="/events"
+                  className="inline-block px-6 py-3 bg-[#4E3AC4] text-white rounded-2xl shadow-md hover:bg-[#3d2ea3] font-sans uppercase transition"
+                >
+                  Voir tous nos événements
+                </a>
+              </div>
+            </>
           )}
         </div>
       </section>
-
 
       <Footer />
     </div>

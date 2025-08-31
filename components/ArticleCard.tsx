@@ -53,7 +53,7 @@ export default function ArticleCard({ article, featured = false }: ArticleCardPr
           {/* Tag Thème en overlay */}
           <div
             className={`
-              absolute bottom-2 left-2 px-3 py-1 rounded-lg text-white text-xs font-['Cambria_Math'] uppercase shadow-md
+              absolute bottom-2 left-2 px-3 py-1 rounded-lg text-white text-xs uppercase shadow-md
               ${getThemeColor(article.theme)}
             `}
           >

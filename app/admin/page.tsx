@@ -1,628 +1,80 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
 import Header from "@/components/Header"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useAuth } from "@/components/Providers"
-import { supabase  } from "@/lib/supabase"
-import { Plus, Edit, Trash2, Users, FileText, MessageSquare } from "lucide-react"
-import Link from "next/link"
+import { FileText, Users, MessageSquare, Calendar, Video } from "lucide-react"
 
-export default function AdminPage() {
-  const { user, loading } = useAuth()
-  const router = useRouter()
+import Articles from "@/components/admin/Articles"
+import UsersPage from "@/components/admin/Users"
+import Comments from "@/components/admin/Comments"
+import Evenements from "@/components/admin/Events"
+import VideosPage from "@/components/admin/Videos"
+
+export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("articles")
-  const [articles, setArticles] = useState<any[]>([])
-  const [users, setUsers] = useState<any[]>([])
-  const [comments, setComments] = useState<any[]>([])
-  const [showCreateForm, setShowCreateForm] = useState(false)
-  const [editingItem, setEditingItem] = useState<any>(null)
-  const themeColors: Record<string, string> = {
-    Culture: "bg-[#fc6cc4]",
-    Sociologie: "bg-[#ff3131]",
-    Géopolitique: "bg-[#f8ec24]",
-    Société: "bg-[#f87c24]",
-    Opinion: "bg-[#c02f2c]",
-    Politique: "bg-[#70b4e4]",
-  }
-  const formatDateForInput = (isoDate: string | null) => {
-    if (!isoDate) return "";
-    return isoDate.split("T")[0]; // Garde seulement la partie YYYY-MM-DD
-  };
 
-  // Vérification des droits admin
-  useEffect(() => {
-    if (!loading && (!user || user.user_metadata?.role !== "admin")) {
-      router.push("/")
-    }
-  }, [user, loading, router])
-
-  // Chargement des données
-  useEffect(() => {
-    if (user && user.user_metadata?.role === "admin") {
-      loadData()
-    }
-  }, [user, activeTab])
-
-  const loadData = async () => {
-    try {
-      if (activeTab === "articles") {
-        const { data } = await supabase
-          .from("articles")
-          .select("*")
-          .order("date_publication", { ascending: false })
-        setArticles(data || [])
-      } else if (activeTab === "users") {
-        const { data } = await supabase.from("users").select("*").order("date_inscription", { ascending: false })
-        setUsers(data || [])
-      } else if (activeTab === "comments") {
-        const { data } = await supabase
-          .from("commentaires")
-          .select("*, users(pseudo), articles(titre)")
-          .order("date_commentaire", { ascending: false })
-        setComments(data || [])
-      }
-    } catch (error) {
-      console.error("Erreur lors du chargement des données:", error)
+  const renderTab = () => {
+    switch (activeTab) {
+      case "articles":
+        return <Articles />
+      case "users":
+        return <UsersPage />
+      case "comments":
+        return <Comments />
+      case "evenements":
+        return <Evenements />
+      case "videos":
+        return <VideosPage />
+      default:
+        return <Articles />
     }
   }
 
-  const handleCreateArticle = async (formData: any) => {
-    console.log("Appel handleCreateArticle avec :", formData, "userId:", user?.id)
-    console.log("📅 Date reçue dans handleCreateArticle:", formData.date_publication)
-
-    try {
-      const { data, error } = await supabase.from("articles").insert([
-        {
-          titre: formData.titre,
-          contenu: formData.contenu,
-          theme: formData.theme,
-          subsection: formData.subsection || null,
-          auteur_id: user?.id,
-          image_couverture: formData.image_couverture,
-          date_publication: formData.date_publication ? new Date(formData.date_publication) : new Date(),
-        },
-      ])
-      console.log("Résultat insert:", { data, error })
-
-      if (error) {
-        console.error("Erreur lors de la création de l'article:", error)
-        return
-      }
-
-      setShowCreateForm(false)
-      loadData()
-      console.log("✅ Article créé avec succès")
-    } catch (error) {
-      console.error("Erreur lors de la création:", error)
-      console.log("problème avec les données du formulaire :", formData)
-    }
-  }
-
-
-  const handleDeleteItem = async (id: string, table: string) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer cet élément ?")) {
-      try {
-        const { error } = await supabase.from(table).delete().eq("id", id)
-
-        if (!error) {
-          loadData()
-        }
-      } catch (error) {
-        console.error("Erreur lors de la suppression:", error)
-      }
-    }
-  }
-
-  const handleUpdateArticle = async (formData: any) => {
-    console.log("Appel handleUpdateArticle avec :", formData);
-
-    if (!formData.id) {
-      console.error("ID de l'article manquant dans formData");
-      return;
-    }
-
-    try {
-      // Construire dynamiquement les champs à mettre à jour
-      const updateData: any = {
-        titre: formData.titre,
-        contenu: formData.contenu,
-        theme: formData.theme,
-        subsection: formData.subsection || null,
-        image_couverture: formData.image_couverture || null,
-      };
-
-      // N'ajouter date_publication que si elle est définie (non null/undefined)
-      if (formData.date_publication !== null && formData.date_publication !== undefined) {
-        updateData.date_publication = formData.date_publication;
-      }
-
-      const { data, error } = await supabase
-        .from("articles")
-        .update(updateData)
-        .eq("id", formData.id)
-        .select();  // Récupération des données mises à jour
-
-      console.log("Résultat update:", { data, error });
-
-      if (error) {
-        console.error("Erreur Supabase lors de la mise à jour de l'article:", error);
-        return;
-      }
-
-      setEditingItem(null);
-      loadData();
-      console.log("✅ Article mis à jour avec succès");
-    } catch (error) {
-      console.error("Erreur JS dans handleUpdateArticle:", error);
-      console.log("formData envoyé :", formData);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#4E3AC4] mx-auto mb-4"></div>
-          <p className="text-[#4B4B4B]">Chargement...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (!user || user.user_metadata?.role !== "admin") {
-    return null
-  }
+  const tabs = [
+    { id: "articles", label: "Articles", icon: <FileText className="w-5 h-5 mr-2" /> },
+    { id: "users", label: "Utilisateurs", icon: <Users className="w-5 h-5 mr-2" /> },
+    { id: "comments", label: "Commentaires", icon: <MessageSquare className="w-5 h-5 mr-2" /> },
+    { id: "evenements", label: "Événements", icon: <Calendar className="w-5 h-5 mr-2" /> },
+    { id: "videos", label: "Vidéos", icon: <Video className="w-5 h-5 mr-2" /> },
+  ]
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       <Header />
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-['Cambria_Math'] text-[#4B4B4B] mb-4">Administration ORASI</h1>
-          <p className="text-lg text-[#4B4B4B] font-['Work_Sans']">Gestion complète de la plateforme</p>
+      <div className="container mx-auto px-6 py-10">
+        {/* Titre */}
+        <div className="mb-10">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-2">Administration ORASI</h1>
+          <p className="text-gray-600 text-lg md:text-xl">Gestion complète de la plateforme</p>
         </div>
 
         {/* Navigation des onglets */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          <Button
-            onClick={() => setActiveTab("articles")}
-            variant={activeTab === "articles" ? "default" : "outline"}
-            className={`
-              rounded-none rounded-br-xl font-['Cambria_Math'] uppercase
-              ${
-                activeTab === "articles"
-                  ? "bg-[#4E3AC4] text-white"
-                  : "border-[#4E3AC4] text-[#4B4B4B] hover:bg-[#4E3AC4] hover:text-white"
-              }
-            `}
-          >
-            <FileText className="w-4 h-4 mr-2" />
-            Articles
-          </Button>
-          <Button
-            onClick={() => setActiveTab("users")}
-            variant={activeTab === "users" ? "default" : "outline"}
-            className={`
-              rounded-none rounded-br-xl font-['Cambria_Math'] uppercase
-              ${
-                activeTab === "users"
-                  ? "bg-[#4E3AC4] text-white"
-                  : "border-[#4E3AC4] text-[#4B4B4B] hover:bg-[#4E3AC4] hover:text-white"
-              }
-            `}
-          >
-            <Users className="w-4 h-4 mr-2" />
-            Utilisateurs
-          </Button>
-          <Button
-            onClick={() => setActiveTab("comments")}
-            variant={activeTab === "comments" ? "default" : "outline"}
-            className={`
-              rounded-none rounded-br-xl font-['Cambria_Math'] uppercase
-              ${
-                activeTab === "comments"
-                  ? "bg-[#4E3AC4] text-white"
-                  : "border-[#4E3AC4] text-[#4B4B4B] hover:bg-[#4E3AC4] hover:text-white"
-              }
-            `}
-          >
-            <MessageSquare className="w-4 h-4 mr-2" />
-            Commentaires
-          </Button>
+        <div className="flex flex-wrap gap-4 mb-8">
+          {tabs.map((tab) => (
+            <Button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              variant={activeTab === tab.id ? "default" : "outline"}
+              className={`
+                flex items-center px-5 py-3 rounded-2xl font-semibold uppercase transition-all
+                shadow-sm hover:shadow-md
+                ${activeTab === tab.id
+                  ? "bg-[#4E3AC4] text-white shadow-lg"
+                  : "border border-gray-300 text-gray-700 hover:bg-[#4E3AC4] hover:text-white"
+                }
+              `}
+            >
+              {tab.icon} {tab.label}
+            </Button>
+          ))}
         </div>
 
-        {/* Contenu des onglets */}
-        {activeTab === "articles" && (
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-['Cambria_Math'] text-[#4B4B4B]">Gestion des Articles</h2>
-              <Button
-                onClick={() => setShowCreateForm(true)}
-                className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-br-xl font-['Cambria_Math'] uppercase"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Nouvel Article
-              </Button>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Titre
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Thème
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Auteur
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Vues
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {articles.map((article) => (
-                      <tr key={article.id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900 max-w-xs truncate">{article.titre}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs font-semibold rounded-full text-white ${themeColors[article.theme] || "bg-gray-300"}`}>
-                            {article.theme}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {article.pseudo || "Inconnu"}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{article.nb_vues}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(article.date_publication).toLocaleDateString("fr-FR")}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setEditingItem(article)}
-                              className="border-[#4E3AC4] text-[#4B4B4B] hover:bg-[#4E3AC4] hover:text-white"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleDeleteItem(article.id, "articles")}
-                              className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "users" && (
-          <div>
-            <h2 className="text-2xl font-['Cambria_Math'] text-[#4B4B4B] mb-6">Gestion des Utilisateurs</h2>
-
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Pseudo
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Rôle
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Inscription
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {users.map((user) => (
-                      <tr key={user.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.pseudo}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              user.role === "admin" ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
-                            }`}
-                          >
-                            {user.role}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(user.date_inscription).toLocaleDateString("fr-FR")}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDeleteItem(user.id, "users")}
-                            className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                            disabled={user.role === "admin"}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "comments" && (
-          <div>
-            <h2 className="text-2xl font-['Cambria_Math'] text-[#4B4B4B] mb-6">Gestion des Commentaires</h2>
-
-            <div className="space-y-4">
-              {comments.map((comment) => (
-                <div key={comment.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-lg font-['Cambria_Math'] text-[#4B4B4B] mb-1">
-                        {comment.users?.pseudo || "Utilisateur supprimé"}
-                      </h3>
-                      <Link href={`/articles/${comment.article_id}`} className="text-sm text-[#4E3AC4] hover:underline">
-                        Sur l'article : {comment.articles?.titre || "Article supprimé"}
-                      </Link>
-                      <p className="text-xs text-gray-400">
-                        {new Date(comment.date_commentaire).toLocaleDateString("fr-FR")}
-                      </p>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDeleteItem(comment.id, "commentaires")}
-                      className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <p className="text-[#4B4B4B] font-['Work_Sans']">{comment.contenu}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Formulaire de création d'article */}
-        {showCreateForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <h3 className="text-2xl font-['Cambria_Math'] text-[#4B4B4B] mb-6">Créer un nouvel article</h3>
-
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  const formData = new FormData(e.currentTarget)
-                  handleCreateArticle({
-                    titre: formData.get("titre"),
-                    contenu: formData.get("contenu"),
-                    theme: formData.get("theme"),
-                    subsection: formData.get("subsection"),
-                    image_couverture: formData.get("image_couverture"),
-                    date_publication: formData.get("date_publication"),
-                  })
-                }}
-              >
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="titre" className="font-['Cambria_Math'] uppercase">
-                      Titre
-                    </Label>
-                    <Input id="titre" name="titre" required className="border-[#4E3AC4] rounded-none rounded-br-xl" />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="theme" className="font-['Cambria_Math'] uppercase">
-                      Thème
-                    </Label>
-                    <Select name="theme" required>
-                      <SelectTrigger className="border-[#4E3AC4] rounded-none rounded-br-xl">
-                        <SelectValue placeholder="Sélectionner un thème" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Géopolitique">Géopolitique</SelectItem>
-                        <SelectItem value="Culture">Culture</SelectItem>
-                        <SelectItem value="Politique">Politique</SelectItem>
-                        <SelectItem value="Société">Société</SelectItem>
-                        <SelectItem value="Opinion">Opinion</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                  <Label htmlFor="subsection" className="font-['Cambria_Math'] uppercase">
-                    Subsection
-                  </Label>
-                  <Input
-                    id="subsection"
-                    name="subsection"
-                    type="text"
-                    placeholder="Ex: Sociologie, Enjeux..."
-                    className="border-[#4E3AC4] rounded-none rounded-br-xl"
-                  />
-                </div>
-
-                  <div>
-                    <Label htmlFor="image_couverture" className="font-['Cambria_Math'] uppercase">
-                      Image de couverture (URL)
-                    </Label>
-                    <Input
-                      id="image_couverture"
-                      name="image_couverture"
-                      type="url"
-                      className="border-[#4E3AC4] rounded-none rounded-br-xl"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="contenu" className="font-['Cambria_Math'] uppercase">
-                      Contenu
-                    </Label>
-                    <Textarea
-                      id="contenu"
-                      name="contenu"
-                      required
-                      rows={10}
-                      className="border-[#4E3AC4] rounded-none rounded-br-xl"
-                    />
-                  </div>
-                <div>
-                  <Label htmlFor="date_publication" className="font-['Cambria_Math'] uppercase">Date de publication</Label>
-                  <Input id="date_publication" name="date_publication" type="date" className="border-[#4E3AC4] rounded-none rounded-br-xl" />
-                </div> 
-                </div>
-
-                <div className="flex justify-end space-x-4 mt-6">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowCreateForm(false)}
-                    className="border-[#4E3AC4] text-[#4B4B4B] hover:bg-[#4E3AC4] hover:text-white rounded-none rounded-br-xl font-['Cambria_Math'] uppercase"
-                  >
-                    Annuler
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-br-xl font-['Cambria_Math'] uppercase"
-                  >
-                    Créer
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {editingItem && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <h3 className="text-2xl font-['Cambria_Math'] text-[#4B4B4B] mb-6">Modifier l'article</h3>
-
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  const formData = new FormData(e.currentTarget)
-                  handleUpdateArticle({
-                    id: editingItem.id, 
-                    titre: formData.get("titre"),
-                    contenu: formData.get("contenu"),
-                    theme: formData.get("theme"),
-                    subsection: formData.get("subsection"),
-                    image_couverture: formData.get("image_couverture"),
-                    date_publication: formData.get("date_publication"),
-                  })
-                }}
-              >
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="titre" className="font-['Cambria_Math'] uppercase">Titre</Label>
-                    <Input id="titre" name="titre" defaultValue={editingItem.titre} required className="border-[#4E3AC4] rounded-none rounded-br-xl" />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="theme" className="font-['Cambria_Math'] uppercase">Thème</Label>
-                    <Select name="theme" defaultValue={editingItem.theme} required>
-                      <SelectTrigger className="border-[#4E3AC4] rounded-none rounded-br-xl">
-                        <SelectValue placeholder="Sélectionner un thème" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Géopolitique">Géopolitique</SelectItem>
-                        <SelectItem value="Culture">Culture</SelectItem>
-                        <SelectItem value="Politique">Politique</SelectItem>
-                        <SelectItem value="Société">Société</SelectItem>
-                        <SelectItem value="Opinion">Opinion</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="subsection" className="font-['Cambria_Math'] uppercase">
-                      Subsection
-                    </Label>
-                    <Input
-                      id="subsection"
-                      name="subsection"
-                      type="text"
-                      defaultValue={editingItem.subsection || ""}
-                      placeholder="Ex: Sociologie, Enjeux..."
-                      className="border-[#4E3AC4] rounded-none rounded-br-xl"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="image_couverture" className="font-['Cambria_Math'] uppercase">Image de couverture (URL)</Label>
-                    <Input id="image_couverture" name="image_couverture" type="url" defaultValue={editingItem.image_couverture} className="border-[#4E3AC4] rounded-none rounded-br-xl" />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="contenu" className="font-['Cambria_Math'] uppercase">Contenu</Label>
-                    <Textarea id="contenu" name="contenu" defaultValue={editingItem.contenu} required rows={10} className="border-[#4E3AC4] rounded-none rounded-br-xl" />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="date_publication" className="font-['Cambria_Math'] uppercase">Date de publication</Label>
-                  <Input
-                    id="date_publication"
-                    name="date_publication"
-                    type="date"
-                    defaultValue={formatDateForInput(editingItem.date_publication)}
-                    className="border-[#4E3AC4] rounded-none rounded-br-xl"
-                  />
-                </div> 
-                <div className="flex justify-end space-x-4 mt-6">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setEditingItem(null)}
-                    className="border-[#4E3AC4] text-[#4B4B4B] hover:bg-[#4E3AC4] hover:text-white rounded-none rounded-br-xl font-['Cambria_Math'] uppercase"
-                  >
-                    Annuler
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-none rounded-br-xl font-['Cambria_Math'] uppercase"
-                  >
-                    Mettre à jour
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
+        {/* Contenu actif */}
+        <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-200 min-h-[60vh] transition-all">
+          {renderTab()}
+        </div>
       </div>
     </div>
   )
