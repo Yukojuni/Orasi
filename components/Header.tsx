@@ -77,10 +77,18 @@ export default function Header() {
                     </Button>
                   </Link>
                 )}
+                <Link href="https://www.helloasso.com/associations/orasi/adhesions/formulaire-d-adhesion-en-tant-que-membre-actif-orasi-8" onClick={() => setIsMenuOpen(false)}>
+                  <Button
+                    variant="outline"
+                    className="w-40 border-[#4E3AC4] text-[#4B4B4B] rounded-xl font-sans uppercase transition-all hover:scale-105"
+                  >
+                    Adhérer
+                  </Button>
+                </Link>
                 <Link href="/profile">
                   <Button
                     variant="outline"
-                    className="border-[#4E3AC4] text-[#4B4B4B] hover:bg-[#4E3AC4]/10 rounded-xl font-sans uppercase transition-all hover:scale-105"
+                    className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-xl font-sans uppercase transition-all hover:scale-105"
                   >
                     Profil
                   </Button>
@@ -144,10 +152,18 @@ export default function Header() {
                     </Button>
                   </Link>
                 )}
+                <Link href="https://www.helloasso.com/associations/orasi/adhesions/formulaire-d-adhesion-en-tant-que-membre-actif-orasi-8" onClick={() => setIsMenuOpen(false)}>
+                  <Button
+                    variant="outline"
+                    className="w-40 border-[#4E3AC4] text-[#4B4B4B] rounded-xl font-sans uppercase transition-all hover:scale-105"
+                  >
+                    Adhérer
+                  </Button>
+                </Link>
                 <Link href="/profile">
                   <Button
                     variant="outline"
-                    className="border-[#4E3AC4] text-[#4B4B4B] hover:bg-[#4E3AC4]/10 rounded-xl font-sans uppercase transition-all hover:scale-105"
+                    className="bg-[#4E3AC4] text-white hover:bg-[#3d2ea3] rounded-xl font-sans uppercase transition-all hover:scale-105"
                   >
                     Profil
                   </Button>

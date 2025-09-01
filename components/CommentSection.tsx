@@ -145,12 +145,12 @@ export default function CommentSection({articleId, filterByUser = false,}: {arti
       <hr className="border-[#4B4B4B] w-full mb-4" />
 
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-[24px] font-['Cambria_Math'] text-black">
+        <h2 className="text-[24px] text-black">
           Commentaires ({comments.length})
         </h2>
         <span
           onClick={() => setOrderAsc(!orderAsc)}
-          className="text-sm text-gray-700 cursor-pointer flex items-center space-x-1 font-['Cambria_Math']"
+          className="text-sm text-gray-700 cursor-pointer flex items-center space-x-1"
         >
           <span>{orderAsc ? "Ancien" : "Récent"}</span>
           <ChevronDown size={16} className={`transition-transform duration-200 ${orderAsc ? "rotate-180" : "rotate-0"}`} />
@@ -165,7 +165,7 @@ export default function CommentSection({articleId, filterByUser = false,}: {arti
             onChange={(e) => setNewComment(e.target.value)}
             className="w-full h-[100px] mb-2"
           />
-          <Button onClick={handleSubmit} className="bg-[#4E3AC4] text-white rounded-none rounded-tl-xl rounded-br-xl font-['Cambria_Math'] uppercase">
+          <Button onClick={handleSubmit} className="bg-[#4E3AC4] text-white rounded-xl uppercase">
             Publier
           </Button>
         </div>
@@ -186,7 +186,7 @@ export default function CommentSection({articleId, filterByUser = false,}: {arti
                 <div className="flex items-start gap-4 relative">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <h3 className="text-lg font-['Cambria_Math'] text-[#4B4B4B]">{auteur?.pseudo || "Anonyme"}</h3>
+                      <h3 className="text-lg text-[#4B4B4B]">{auteur?.pseudo || "Anonyme"}</h3>
                       <span className="text-xs text-gray-500">
                         {new Date(c.date_commentaire).toLocaleDateString("fr-FR", {
                           day: "numeric",
@@ -196,7 +196,7 @@ export default function CommentSection({articleId, filterByUser = false,}: {arti
                       </span>
                     </div>
 
-                    <p className="text-[#4B4B4B] font-['Work_Sans'] mb-4 whitespace-pre-line">{c.contenu}</p>
+                    <p className="text-[#4B4B4B] mb-4 whitespace-pre-line">{c.contenu}</p>
 
                     <div className="flex items-center gap-4 text-xs text-gray-500">
                       <button

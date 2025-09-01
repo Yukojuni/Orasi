@@ -184,6 +184,11 @@ function ArticleForm({ initialData, onClose, onSubmit }: any) {
           </div>
 
           <div>
+            <Label>Image de couverture (URL)</Label>
+            <Input value={image_couverture} onChange={(e) => setImageCouverture(e.target.value)} className="border-gray-300 rounded-xl" />
+          </div>
+
+          <div>
             <Label>Thème</Label>
             <Select value={theme} onValueChange={setTheme} required>
               <SelectTrigger className="border-gray-300 rounded-xl"><SelectValue placeholder="Sélectionner un thème" /></SelectTrigger>
@@ -195,11 +200,6 @@ function ArticleForm({ initialData, onClose, onSubmit }: any) {
                 <SelectItem value="Opinion">Opinion</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          <div>
-            <Label>Auteur</Label>
-            <Input value={auteur} onChange={(e) => setAuteur(e.target.value)} required className="border-gray-300 rounded-xl" />
           </div>
 
           <div>
@@ -221,8 +221,8 @@ function ArticleForm({ initialData, onClose, onSubmit }: any) {
           </div>
 
           <div>
-            <Label>Image de couverture (URL)</Label>
-            <Input value={image_couverture} onChange={(e) => setImageCouverture(e.target.value)} className="border-gray-300 rounded-xl" />
+            <Label>Auteur</Label>
+            <Input value={auteur} onChange={(e) => setAuteur(e.target.value)} required className="border-gray-300 rounded-xl" />
           </div>
 
           <div>
