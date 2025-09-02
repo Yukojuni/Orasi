@@ -7,8 +7,6 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { supabase } from "@/lib/supabase"
 import { Plus, Edit, Trash2, ChevronDown, ChevronUp } from "lucide-react"
-
-// Draft.js et react-draft-wysiwyg
 import dynamic from "next/dynamic"
 import { EditorState, convertToRaw, convertFromRaw } from "draft-js"
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"
@@ -24,6 +22,7 @@ export default function Articles() {
   const [editing, setEditing] = useState<any>(null)
   const [sortField, setSortField] = useState<string>("date_publication")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
+  const [searchTerm, setSearchTerm] = useState("")
 
   const themeColors: Record<string, string> = {
     Culture: "bg-[#fc6cc4]",
@@ -85,21 +84,35 @@ export default function Articles() {
     return sortOrder === "asc" ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
   }
 
+  const filteredArticles = articles.filter(
+    (a) =>
+      a.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.auteur.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
         <h2 className="text-3xl font-bold text-gray-800 mb-3 md:mb-0">Gestion des Articles</h2>
-        <Button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 bg-[#4E3AC4] text-white rounded-2xl px-4 py-2 shadow hover:shadow-lg transition"
-        >
-          <Plus className="w-5 h-5" /> Nouvel Article
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Input
+            placeholder="Rechercher..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-xs"
+          />
+          <Button
+            onClick={() => setShowForm(true)}
+            className="flex items-center gap-2 bg-[#4E3AC4] text-white rounded-2xl px-4 py-2 shadow hover:shadow-lg transition"
+          >
+            <Plus className="w-5 h-5" /> Nouvel Article
+          </Button>
+        </div>
       </div>
 
       <div className="overflow-x-auto bg-white shadow rounded-2xl border border-gray-200">
-        <table className="w-full min-w-[600px] table-auto">
-          <thead className="bg-gray-50">
+        <table className="w-full min-w-[800px] table-auto">
+          <thead className="bg-gray-50 sticky top-0 z-10">
             <tr>
               {["titre", "theme", "auteur", "date_publication"].map((col) => (
                 <th
@@ -117,17 +130,17 @@ export default function Articles() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {articles.map((a) => (
+            {filteredArticles.map((a) => (
               <tr key={a.id} className="hover:bg-gray-50 transition">
-                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-700">{a.titre}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 font-medium text-gray-700">{a.titre}</td>
+                <td className="px-6 py-4">
                   <span className={`px-2 py-1 inline-flex text-xs font-semibold rounded-full text-white ${themeColors[a.theme] || "bg-gray-300"}`}>
                     {a.theme}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-700">{a.auteur}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-gray-500">{new Date(a.date_publication).toLocaleDateString("fr-FR")}</td>
-                <td className="px-6 py-4 whitespace-nowrap flex gap-2">
+                <td className="px-6 py-4 text-gray-700">{a.auteur}</td>
+                <td className="px-6 py-4 text-gray-500">{new Date(a.date_publication).toLocaleDateString("fr-FR")}</td>
+                <td className="px-6 py-4 flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => { setEditing(a); setShowForm(true) }}>
                     <Edit className="w-4 h-4" />
                   </Button>
@@ -159,8 +172,6 @@ function ArticleForm({ initialData, onClose, onSubmit }: any) {
   const [subsection, setSubsection] = useState(initialData?.subsection || "")
   const [image_couverture, setImageCouverture] = useState(initialData?.image_couverture || "")
   const [date_publication, setDatePublication] = useState(initialData?.date_publication?.split("T")[0] || "")
-
-  // Contenu avec draft-js
   const [contenu, setContenu] = useState<EditorState>(
     initialData?.contenu
       ? EditorState.createWithContent(convertFromRaw(JSON.parse(initialData.contenu)))
@@ -175,9 +186,9 @@ function ArticleForm({ initialData, onClose, onSubmit }: any) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-lg">
-        <h3 className="text-2xl font-bold mb-6">{initialData ? "Modifier" : "Créer"} un article</h3>
-        <form onSubmit={handleSubmitForm} className="space-y-5">
+      <div className="bg-white rounded-2xl p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-lg space-y-5">
+        <h3 className="text-2xl font-bold mb-4">{initialData ? "Modifier" : "Créer"} un article</h3>
+        <form onSubmit={handleSubmitForm} className="space-y-4">
           <div>
             <Label>Titre</Label>
             <Input value={titre} onChange={(e) => setTitre(e.target.value)} required className="border-gray-300 rounded-xl" />
@@ -188,23 +199,25 @@ function ArticleForm({ initialData, onClose, onSubmit }: any) {
             <Input value={image_couverture} onChange={(e) => setImageCouverture(e.target.value)} className="border-gray-300 rounded-xl" />
           </div>
 
-          <div>
-            <Label>Thème</Label>
-            <Select value={theme} onValueChange={setTheme} required>
-              <SelectTrigger className="border-gray-300 rounded-xl"><SelectValue placeholder="Sélectionner un thème" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Géopolitique">Géopolitique</SelectItem>
-                <SelectItem value="Culture">Culture</SelectItem>
-                <SelectItem value="Politique">Politique</SelectItem>
-                <SelectItem value="Société">Société</SelectItem>
-                <SelectItem value="Opinion">Opinion</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Thème</Label>
+              <Select value={theme} onValueChange={setTheme} required>
+                <SelectTrigger className="border-gray-300 rounded-xl"><SelectValue placeholder="Sélectionner un thème" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Géopolitique">Géopolitique</SelectItem>
+                  <SelectItem value="Culture">Culture</SelectItem>
+                  <SelectItem value="Politique">Politique</SelectItem>
+                  <SelectItem value="Société">Société</SelectItem>
+                  <SelectItem value="Opinion">Opinion</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div>
-            <Label>Subsection</Label>
-            <Input value={subsection} onChange={(e) => setSubsection(e.target.value)} className="border-gray-300 rounded-xl" />
+            <div>
+              <Label>Subsection</Label>
+              <Input value={subsection} onChange={(e) => setSubsection(e.target.value)} className="border-gray-300 rounded-xl" />
+            </div>
           </div>
 
           <div>
@@ -220,14 +233,16 @@ function ArticleForm({ initialData, onClose, onSubmit }: any) {
             />
           </div>
 
-          <div>
-            <Label>Auteur</Label>
-            <Input value={auteur} onChange={(e) => setAuteur(e.target.value)} required className="border-gray-300 rounded-xl" />
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Auteur</Label>
+              <Input value={auteur} onChange={(e) => setAuteur(e.target.value)} required className="border-gray-300 rounded-xl" />
+            </div>
 
-          <div>
-            <Label>Date de publication</Label>
-            <Input type="date" value={date_publication} onChange={(e) => setDatePublication(e.target.value)} className="border-gray-300 rounded-xl" />
+            <div>
+              <Label>Date de publication</Label>
+              <Input type="date" value={date_publication} onChange={(e) => setDatePublication(e.target.value)} className="border-gray-300 rounded-xl" />
+            </div>
           </div>
 
           <div className="flex justify-end gap-4 mt-4">

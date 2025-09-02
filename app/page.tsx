@@ -17,6 +17,23 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel"
 
+
+function getExcerpt(contenu: string | undefined, maxLength = 120): string {
+  if (!contenu) return ""
+  try {
+    // 👉 Essayer de parser comme Draft.js JSON
+    const raw = JSON.parse(contenu)
+    if (raw.blocks && Array.isArray(raw.blocks)) {
+      const text = raw.blocks.map((block: any) => block.text).join(" ")
+      return text.length > maxLength ? text.substring(0, maxLength) + "..." : text
+    }
+    return contenu.substring(0, maxLength) + "..."
+  } catch (e) {
+    // 👉 Si ce n’est PAS du JSON → texte brut
+    return contenu.length > maxLength ? contenu.substring(0, maxLength) + "..." : contenu
+  }
+}
+
 export default function HomePage() {
   const [articles, setArticles] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -96,7 +113,7 @@ export default function HomePage() {
                   {articles[0]?.titre}
                 </h1>
                 <p className="text-gray-700 mt-2 line-clamp-3">
-                  {articles[0]?.contenu?.substring(0, 150)}...
+                  {getExcerpt(articles[0]?.contenu, 150)}
                 </p>
               </div>
             </Link>
@@ -117,12 +134,13 @@ export default function HomePage() {
                   <h3 className="font-semibold text-lg text-[#4B4B4B] leading-snug line-clamp-2">
                     {article.titre}
                   </h3>
-                  <p className="text-sm text-gray-600 line-clamp-2">{article.contenu.substring(0, 80)}...</p>
+                  <p className="text-sm text-gray-600 line-clamp-2">
+                    {getExcerpt(article.contenu, 80)}
+                  </p>
                 </div>
               </Link>
             ))}
           </div>
-
           {/* === ÉVÉNEMENT À VENIR === */}
           <div className="lg:col-span-1 relative">
             {evenements[0] ? (

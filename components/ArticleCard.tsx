@@ -17,6 +17,22 @@ interface ArticleCardProps {
   featured?: boolean
 }
 
+// 🔑 Fonction utilitaire pour extraire un résumé propre
+function getExcerpt(contenu: string, maxLength = 120): string {
+  try {
+    // 👉 Essayer de parser comme Draft.js JSON
+    const raw = JSON.parse(contenu)
+    if (raw.blocks && Array.isArray(raw.blocks)) {
+      const text = raw.blocks.map((block: any) => block.text).join(" ")
+      return text.length > maxLength ? text.substring(0, maxLength) + "..." : text
+    }
+    return contenu.substring(0, maxLength) + "..."
+  } catch (e) {
+    // 👉 Si ce n’est PAS du JSON → texte brut
+    return contenu.length > maxLength ? contenu.substring(0, maxLength) + "..." : contenu
+  }
+}
+
 export default function ArticleCard({ article, featured = false }: ArticleCardProps) {
   const getThemeColor = (theme: string) => {
     const colors = {
@@ -48,9 +64,7 @@ export default function ArticleCard({ article, featured = false }: ArticleCardPr
             alt={article.titre}
             className="w-full h-full object-cover"
           />
-          {/* Overlay dégradé pour lisibilité */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-          {/* Tag Thème en overlay */}
           <div
             className={`
               absolute bottom-2 left-2 px-3 py-1 rounded-lg text-white text-xs uppercase shadow-md
@@ -74,7 +88,7 @@ export default function ArticleCard({ article, featured = false }: ArticleCardPr
 
           {/* Extrait */}
           <p className="text-sm text-gray-600 line-clamp-3 mb-3">
-            {article.contenu.substring(0, 120)}...
+            {getExcerpt(article.contenu, 120)}
           </p>
 
           {/* Métadonnées */}
